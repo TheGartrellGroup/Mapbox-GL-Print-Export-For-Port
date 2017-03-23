@@ -5,3 +5,8 @@
     background-position: center;
     vertical-align: middle;
 }
+
+.preview-container {
+    min-height: 300px;
+    min-width: 470px;
+}

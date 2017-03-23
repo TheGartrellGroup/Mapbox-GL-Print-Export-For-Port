@@ -16,6 +16,8 @@ PrintControl.prototype.onAdd = function(map) {
     this._printBtn.setAttribute('data-toggle', 'modal');
     this._printBtn.setAttribute('data-target', '#map-print-modal') // #map-print-modal is the DOM  ID
 
+    this._printBtn.addEventListener('mousedown', this.initializeCropper.bind(this));
+
     // export-map is the primary button within the map-print-modal
     document.querySelector('#export-map').addEventListener('mousedown', this.onPrintDown.bind(this));
 
@@ -29,6 +31,23 @@ PrintControl.prototype.onRemove = function() {
     return this;
 }
 
+PrintControl.prototype.initializeCropper = function (e) {
+    var _this = this;
+
+    var exportView = $('#export-view');
+    exportView.attr('src', map.getCanvas().toDataURL());
+    exportView.css('max-width', '100%')
+
+    _this.cropper = exportView.cropper({
+        aspectRatio: 1.5/1,
+        zoomable: false,
+        zoomOnWheel: false,
+        minContainerHeight: 300,
+        minContainerWidth: 568,
+
+    })
+}
+
 PrintControl.prototype.onPrintDown = function (e) {
     var _this = this;
 
@@ -38,11 +57,10 @@ PrintControl.prototype.onPrintDown = function (e) {
     var center = map.getCenter();
     var bearing = map.getBearing();
 
-    _this.printCanvas(width, height, dpi, type, unit, zoom, center, bearing);
-
+    _this.printCanvas(type, size, zoom, center, bearing);
 }
 
-PrintControl.prototype.printCanvas = function(width, height, dpi, type, unit, zoom, center, bearing) {
+PrintControl.prototype.printCanvas = function(type, size, zoom, center, bearing) {
     var _this = this;
 
     //based on Print Maps - https://github.com/mpetroff/print-maps

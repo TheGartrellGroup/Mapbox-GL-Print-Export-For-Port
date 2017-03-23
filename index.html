@@ -9,6 +9,7 @@
     <link href='node_modules/bootstrap/dist/css/bootstrap.min.css' rel='stylesheet' />
     <link href='node_modules/MapboxGL-Layer-Tree/dist/css/styles.min.css' rel='stylesheet' />
     <link href='dist/css/styles.min.css' rel='stylesheet' />
+    <link href='css/print.css' rel='stylesheet' />
     <link href='css/app.css' rel='stylesheet' />
 </head>
 <body>
@@ -23,6 +24,10 @@
           <h4 class="modal-title">Print Modal</h4>
         </div>
         <div class="modal-body">
+          <!-- cropper view -->
+          <div class="preview-container">
+              <img id='export-view' />
+          </div>
           <!-- print form -->
           <form class="form-horizontal container-fluid" id="print-form">
             <div class="row">
@@ -58,22 +63,16 @@
               </div>
 
               <!-- title & subtitle -->
-              <div>
-                <div class="form-group col-sm-5">
+              <div class="col">
+                <div class="form-group col-sm-6">
                   <label class="col-md-4 control-label" for="export-title">Title</label>
                   <input id="export-title" name="export-title" type="text" placeholder="My Title" class="form-control input-md">
                 </div>
-                <div class="form-group col-sm-5">
+                <div class="form-group col-sm-6">
                   <label class="col-md-4 control-label" for="export-subtitle">Subtitle</label>
                   <input id="export-title" name="export-subtitle" type="text" placeholder="My Subtitle" class="form-control input-md">
                 </div>
               </div>
-
-              <!-- disclaimer -->
-<!--               <div class="form-group col-sm-10">
-                <label class="col-md-4 control-label" for="export-disclaimer">Disclaimer</label>
-                <input id="export-disclaimer" name="export-disclaimer" type="text" placeholder="" class="form-control input-md">
-              </div> -->
             </div>
           </form>
         <div class="modal-footer">

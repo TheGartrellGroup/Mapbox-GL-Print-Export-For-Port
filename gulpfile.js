@@ -22,7 +22,7 @@ gulp.task('watch', function(){
 
 //minify js
 gulp.task('scripts', function() {
-  gulp.src(['node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.min.js', 'node_modules/jspdf/dist/jspdf.min.js', 'node_modules/filesaver.js/FileSaver.min.js', 'js/print.js'])
+  gulp.src(['node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.min.js', 'node_modules/jspdf/dist/jspdf.min.js', 'node_modules/filesaver.js/FileSaver.min.js', 'node_modules/cropper/dist/cropper.min.js', 'js/print.js'])
     .pipe(concat('scripts.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('dist/js'))
@@ -30,7 +30,7 @@ gulp.task('scripts', function() {
 
 //minify css
 gulp.task('css', function() {
-  gulp.src(['css/print.css'])
+  gulp.src(['css/print.css', 'node_modules/cropper/dist/cropper.min.css'])
     .pipe(concat('styles.min.css'))
     .pipe(cleanCSS())
     .pipe(gulp.dest('dist/css'))
