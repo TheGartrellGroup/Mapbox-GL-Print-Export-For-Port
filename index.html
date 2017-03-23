@@ -12,8 +12,77 @@
     <link href='css/app.css' rel='stylesheet' />
 </head>
 <body>
+  <div id='map'></div>
 
-<div id='map'></div>
+  <!-- print modal-->
+  <div class="modal fade" id="map-print-modal" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Print Modal</h4>
+        </div>
+        <div class="modal-body">
+          <!-- print form -->
+          <form class="form-horizontal container-fluid" id="print-form">
+            <div class="row">
+
+              <!-- output format -->
+              <div class="radio-groups format form-group col-sm-6">
+                <label class="control-label" for="output-format">Output Format</label>
+                <div>
+                  <label class="radio-inline" for="output-format-0">
+                    <input type="radio" name="output-format" id="output-format-0" value="png" checked="checked">
+                    PNG
+                  </label>
+                  <label class="radio-inline" for="output-format-1">
+                    <input type="radio" name="output-format" id="output-format-1" value="pdf">
+                    PDF
+                  </label>
+                </div>
+              </div>
+
+              <!-- dimensions -->
+              <div class="radio-groups size form-group col-sm-6">
+                <label class="control-label" for="dimensions">Dimensions</label>
+                <div>
+                  <label class="radio-inline" for="dimensions-0">
+                    <input type="radio" name="dimensions" id="dimensions-0" value="default" checked="checked">
+                    8.5 x 11
+                  </label>
+                  <label class="radio-inline" for="dimensions-1">
+                    <input type="radio" name="dimensions" id="dimensions-1" value="large">
+                    11 x 17
+                  </label>
+                </div>
+              </div>
+
+              <!-- title & subtitle -->
+              <div>
+                <div class="form-group col-sm-5">
+                  <label class="col-md-4 control-label" for="export-title">Title</label>
+                  <input id="export-title" name="export-title" type="text" placeholder="My Title" class="form-control input-md">
+                </div>
+                <div class="form-group col-sm-5">
+                  <label class="col-md-4 control-label" for="export-subtitle">Subtitle</label>
+                  <input id="export-title" name="export-subtitle" type="text" placeholder="My Subtitle" class="form-control input-md">
+                </div>
+              </div>
+
+              <!-- disclaimer -->
+<!--               <div class="form-group col-sm-10">
+                <label class="col-md-4 control-label" for="export-disclaimer">Disclaimer</label>
+                <input id="export-disclaimer" name="export-disclaimer" type="text" placeholder="" class="form-control input-md">
+              </div> -->
+            </div>
+          </form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" id="export-map" class="btn btn-primary">Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script src='node_modules/mapbox-gl/dist/mapbox-gl.js'></script>
 <script src='node_modules/MapboxGL-Layer-Tree/dist/js/scripts.min.js'></script>

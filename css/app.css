@@ -8,3 +8,11 @@ body {
     bottom:0;
     width:100%;
 }
+
+.radio-groups {
+    text-align: center;
+}
+
+.form-horizontal .control-label {
+    text-align: left;
+}

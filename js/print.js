@@ -11,8 +11,13 @@ PrintControl.prototype.onAdd = function(map) {
     this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
 
     this._printBtn = document.createElement('button');
-    this._printBtn.className = 'mapboxgl-ctrl-icon mapboxgl-ctrl-print'
-    this._printBtn.addEventListener('mousedown', this.onPrintDown.bind(this));
+    this._printBtn.className = 'mapboxgl-ctrl-icon mapboxgl-ctrl-print';
+
+    this._printBtn.setAttribute('data-toggle', 'modal');
+    this._printBtn.setAttribute('data-target', '#map-print-modal') // #map-print-modal is the DOM  ID
+
+    // export-map is the primary button within the map-print-modal
+    document.querySelector('#export-map').addEventListener('mousedown', this.onPrintDown.bind(this));
 
     this._container.appendChild(this._printBtn);
     return this._container;
@@ -27,64 +32,14 @@ PrintControl.prototype.onRemove = function() {
 PrintControl.prototype.onPrintDown = function (e) {
     var _this = this;
 
-    bootbox.confirm(_this.createForm(), function(result) {
-      if (result) {
-        var type = $("form#printForm input[type='radio']:checked").val();
-        var dpi = $("form#printForm #dpiInput").val();
-        var width = parseInt($("form#printForm #widthInput ").val(), 10);
-        var height = parseInt($("form#printForm #heightInput").val(), 10);
-        var unit = 'in';
+    var type = $("form#print-form .format input[type='radio']:checked").val();
+    var size = $("form#print-form .size input[type='radio']:checked").val();
+    var zoom = map.getZoom();
+    var center = map.getCenter();
+    var bearing = map.getBearing();
 
-        var zoom = map.getZoom();
-        var center = map.getCenter();
-        var bearing = map.getBearing();
+    _this.printCanvas(width, height, dpi, type, unit, zoom, center, bearing);
 
-        _this.printCanvas(width, height, dpi, type, unit, zoom, center, bearing);
-      }
-    });
-}
-
-PrintControl.prototype.createForm = function() {
-    var form="";
-    form += "<form id=\"printForm\">";
-    form += "  <fieldset id=\"config-fields\">";
-    form += "  <div class=\"row\">";
-    form += "    <div class=\"col-sm-6 col-md-6\">";
-    form += "      <div class=\"form-group\">";
-    form += "        <label>Output format<\/label><br>";
-    form += "        <label class=\"radio-inline\">";
-    form += "          <input type=\"radio\" name=\"outputOptions\" value=\"png\" checked> PNG";
-    form += "        <\/label>";
-    form += "        <label class=\"radio-inline\">";
-    form += "          <input type=\"radio\" name=\"outputOptions\" value=\"pdf\"> PDF";
-    form += "        <\/label>";
-    form += "      <\/div>";
-    form += "    <\/div>";
-    form += "    <div class=\"col-sm-6 col-md-6\">";
-    form += "      <div class=\"form-group\" id=\"dpiGroup\">";
-    form += "        <label for=\"dpiInput\">DPI<\/label>";
-    form += "        <input type=\"text\" class=\"form-control\" id=\"dpiInput\" autocomplete=\"off\" value=\"300\">";
-    form += "      <\/div>";
-    form += "    <\/div>";
-    form += "  <\/div>";
-    form += "  <div class=\"row\">";
-    form += "    <div class=\"col-sm-6 col-md-6\">";
-    form += "      <div class=\"form-group\" id=\"widthGroup\">";
-    form += "        <label for=\"widthInput\">Width<\/label>";
-    form += "        <input type=\"text\" class=\"form-control\" id=\"widthInput\" autocomplete=\"off\" value=\"8\">";
-    form += "      <\/div>";
-    form += "    <\/div>";
-    form += "    <div class=\"col-sm-6 col-md-6\">";
-    form += "      <div class=\"form-group\" id=\"heightGroup\">";
-    form += "        <label for=\"heightInput\">Height<\/label>";
-    form += "        <input type=\"text\" class=\"form-control\" id=\"heightInput\" autocomplete=\"off\" value=\"6\">";
-    form += "      <\/div>";
-    form += "    <\/div>";
-    form += "  <\/div>";
-    form += "  <\/fieldset>";
-    form += "<\/form>";
-
-    return form;
 }
 
 PrintControl.prototype.printCanvas = function(width, height, dpi, type, unit, zoom, center, bearing) {

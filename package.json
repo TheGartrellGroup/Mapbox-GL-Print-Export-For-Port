@@ -17,7 +17,8 @@
     "gulp-uglify": "^2.0.1",
     "gulp-webserver": "^0.9.1",
     "jquery": "2.2.4",
-    "jspdf": "1.3.3",
+    "jspdf": "^1.3.3",
+    "cropper": "^3.0.0-beta",
     "mapbox-gl": "^0.32.1"
   },
   "main": "map.js"
