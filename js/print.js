@@ -64,16 +64,21 @@ PrintControl.prototype.onPrintDown = function (e) {
 
     var type = $("form#print-form .format input[type='radio']:checked").val();
     var size = $("form#print-form .size input[type='radio']:checked").val();
+    var mapText = {
+        title: $('#export-title').val(),
+        subtitle: $('#export-subtitle').val(),
+        disclaimer: _this.options.disclaimer
+    };
     var zoom = map.getZoom();
     var center = map.getCenter();
     var bearing = map.getBearing();
 
-    _this.printCanvas(type, size, zoom, center, bearing);
+    _this.printCanvas(type, size, mapText, zoom, center, bearing);
 }
 
-PrintControl.prototype.printCanvas = function(type, size, zoom, center, bearing) {
+PrintControl.prototype.printCanvas = function(type, size, mapText, zoom, center, bearing) {
     var _this = this;
-    var dimensions = (size === 'default') ? [816, 1056] : [1056, 1632];
+    var dimensions = (size === 'default') ? [612, 792] : [1056, 1632];
 
     if (type === 'png') {
         var mapCanvas = map.getCanvas();
@@ -90,27 +95,36 @@ PrintControl.prototype.printCanvas = function(type, size, zoom, center, bearing)
     } else {
         var pdf = new jsPDF({
             orientation: 'landscape',
-            unit: 'px',
+            unit: 'in',
             format: dimensions
         });
 
         if (size === 'default') {
-            pdf.addImage(map.getCanvas().toDataURL('image/png'),
-                'png', 5, 5, 1046, 705);
+            if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
+                var mar = 20;
+
+                pdf.addImage(map.getCanvas().toDataURL('image/png'),
+                    'png', 0, 0, 792, 504);
+                pdf.setFontSize(20);
+                pdf.text(mapText.title, mar, 528);
+
+                pdf.setFontSize(14);
+                pdf.text(mapText.subtitle, mar, 548);
+
+                pdf.setFontSize(10);
+                var lines = pdf.splitTextToSize(mapText.disclaimer, dimensions[1] - (mar * 2)); //986  = [width - (start + end locations)]
+                pdf.text(mar, 564, lines);
+            }
+
             pdf.save('map.pdf');
         } else {
             pdf.addImage(map.getCanvas().toDataURL('image/png'),
-                'png', 5, 5, 1435, 965);
+                'png', 10, 10, 1430, 960);
             pdf.save('map.pdf');
         }
 
 
     }
-}
-
-PrintControl.prototype.toPixels = function(val) {
-    var conversionFactor = 96;
-    return conversionFactor * val;
 }
 
 
