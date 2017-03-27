@@ -16,6 +16,7 @@ PrintControl.prototype.onAdd = function(map) {
     this._container.style.display = 'none';
 
     this.onReady(map);
+
     return this._container;
 }
 
@@ -37,21 +38,42 @@ PrintControl.prototype.onReady = function(map) {
             // export-map is the primary button within the map-print-modal
             document.querySelector('#export-map').addEventListener('mousedown', that.onPrintDown.bind(that));
             that._container.style.display = 'block';
-            map.off('render', layersLoaded)
+            map.off('render', layersLoaded);
+
+            that.watchDimensions();
         }
     }
 
     map.on('render', layersLoaded);
 }
 
+PrintControl.prototype.watchDimensions = function(map) {
+    var that = this;
+
+    $(document).ready(function() {
+        $('input[type=radio][name=dimensions]').change(function() {
+            if (this.value === 'default') {
+                that.cropper.cropper('setAspectRatio', 1.294)
+            }
+            else if (this.value == 'large') {
+                that.cropper.cropper('setAspectRatio', 1.545)
+            }
+        });
+    });
+}
+
 
 PrintControl.prototype.initializeCropper = function (e) {
+    if (this.cropper && this.cropper.cropper()) {
+        this.cropper.cropper('destroy');
+    }
+
     var exportView = $('#export-view');
     exportView.attr('src', map.getCanvas().toDataURL());
     exportView.css('max-width', '100%')
 
     this.cropper = exportView.cropper({
-        aspectRatio: 1.3/1,
+        aspectRatio: 1.294/1,
         zoomable: false,
         zoomOnWheel: false,
         minContainerHeight: 300,
@@ -95,7 +117,7 @@ PrintControl.prototype.printCanvas = function(type, size, mapText, zoom, center,
     } else {
         var pdf = new jsPDF({
             orientation: 'landscape',
-            unit: 'in',
+            unit: 'pt',
             format: dimensions
         });
 
@@ -103,27 +125,25 @@ PrintControl.prototype.printCanvas = function(type, size, mapText, zoom, center,
             if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
                 var mar = 20;
 
-                pdf.addImage(map.getCanvas().toDataURL('image/png'),
+                pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
                     'png', 0, 0, 792, 504);
                 pdf.setFontSize(20);
                 pdf.text(mapText.title, mar, 528);
 
-                pdf.setFontSize(14);
+                pdf.setFontSize(16);
                 pdf.text(mapText.subtitle, mar, 548);
 
-                pdf.setFontSize(10);
-                var lines = pdf.splitTextToSize(mapText.disclaimer, dimensions[1] - (mar * 2)); //986  = [width - (start + end locations)]
+                pdf.setFontSize(12);
+                var lines = pdf.splitTextToSize(mapText.disclaimer, dimensions[1] - (mar * 2));
                 pdf.text(mar, 564, lines);
             }
 
-            pdf.save('map.pdf');
+            pdf.save('foo.pdf');
         } else {
-            pdf.addImage(map.getCanvas().toDataURL('image/png'),
+            pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
                 'png', 10, 10, 1430, 960);
             pdf.save('map.pdf');
         }
-
-
     }
 }
 
