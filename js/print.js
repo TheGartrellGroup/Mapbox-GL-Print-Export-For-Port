@@ -110,100 +110,102 @@ PrintControl.prototype.onPrintDown = function (e) {
     var center = map.getCenter();
     var bearing = map.getBearing();
 
-    _this.printCanvas(type, size, mapText, zoom, center, bearing);
+    type === 'png' ? _this.printPNG(size, mapText, zoom, center, bearing) : _this.printPDF(size, mapText, zoom, center, bearing)
 }
 
-PrintControl.prototype.printCanvas = function(type, size, mapText, zoom, center, bearing) {
+PrintControl.prototype.printPNG = function(size, mapText, zoom, center, bearing) {
     var _this = this;
     var dimensions = (size === 'default') ? [612, 792] : [792, 1224];
 
-    if (type === 'png') {
-        var mapCanvas = map.getCanvas();
-        var tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = _this.toPixels(dimensions[1]);
-        tmpCanvas.height = _this.toPixels(dimensions[0]);
+    var mapCanvas = map.getCanvas();
+    var tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = _this.toPixels(dimensions[1]);
+    tmpCanvas.height = _this.toPixels(dimensions[0]);
 
-        var ctx = tmpCanvas.getContext('2d');
-        ctx.drawImage(mapCanvas,0,0,mapCanvas.width,mapCanvas.height,0,0,tmpCanvas.width,tmpCanvas.height);
+    var ctx = tmpCanvas.getContext('2d');
+    ctx.drawImage(mapCanvas,0,0,mapCanvas.width,mapCanvas.height,0,0,tmpCanvas.width,tmpCanvas.height);
 
-        tmpCanvas.toBlob(function(blob) {
-            saveAs(blob, 'map.png');
-        });
+    tmpCanvas.toBlob(function(blob) {
+        saveAs(blob, 'map.png');
+}
+
+PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing) {
+    var _this = this;
+    var dimensions = (size === 'default') ? [612, 792] : [792, 1224];
+    var pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: dimensions
+    });
+
+    if (size === 'default') {
+      if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
+          pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+              'png', 0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+          var pad1 = 20;
+          pdf.setFontSize(pad1 - 5);
+          pdf.text(mapText.title, MARGINS, DEFAULT_HEIGHT + pad1);
+
+          var pad2 = 16;
+          pdf.setFontSize(pad2 - 2);
+          pdf.text(mapText.subtitle, MARGINS, DEFAULT_HEIGHT + pad1 + pad2);
+
+          var pad3 = 13;
+          pdf.setFontSize(pad3 - 3);
+          var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
+          pdf.text(MARGINS, DEFAULT_HEIGHT + pad1 + pad2 + pad3, lines);
+
+      } else if (mapText.title !== '' && mapText.disclaimer !== '') {
+          var height = DEFAULT_HEIGHT + 4;
+          pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+              'png', 0, 0, DEFAULT_WIDTH, height);
+
+          var pad1 = 23;
+          pdf.setFontSize(pad1 - 8);
+          pdf.text(mapText.title, MARGINS, height + pad1);
+
+          var pad2 = 18;
+          pdf.setFontSize(pad2 - 8);
+          var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
+          pdf.text(MARGINS, height + pad1 + pad2, lines);
+      }
+
+      pdf.save('map.pdf');
     } else {
-        var pdf = new jsPDF({
-            orientation: 'landscape',
-            unit: 'pt',
-            format: dimensions
-        });
+        if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
+            pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+                'png', 0, 0, LARGE_WIDTH, LARGE_HEIGHT);
 
-        if (size === 'default') {
-          if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
-              pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                  'png', 0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+            var pad1 = 26;
+            pdf.setFontSize(pad1 - 5);
+            pdf.text(mapText.title, MARGINS, LARGE_HEIGHT + pad1);
 
-              var pad1 = 20;
-              pdf.setFontSize(pad1 - 5);
-              pdf.text(mapText.title, MARGINS, DEFAULT_HEIGHT + pad1);
+            var pad2 = 22;
+            pdf.setFontSize(pad2 - 6);
+            pdf.text(mapText.subtitle, MARGINS, LARGE_HEIGHT + pad1 + pad2);
 
-              var pad2 = 16;
-              pdf.setFontSize(pad2 - 2);
-              pdf.text(mapText.subtitle, MARGINS, DEFAULT_HEIGHT + pad1 + pad2);
+            var pad3 = 19;
+            pdf.setFontSize(pad3 - 6);
+            var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
+            pdf.text(MARGINS, LARGE_HEIGHT + pad1 + pad2 + pad3, lines);
 
-              var pad3 = 13;
-              pdf.setFontSize(pad3 - 3);
-              var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
-              pdf.text(MARGINS, DEFAULT_HEIGHT + pad1 + pad2 + pad3, lines);
+        } else if (mapText.title !== '' && mapText.disclaimer !== '') {
+          var height = LARGE_HEIGHT + 4;
+          pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+              'png', 0, 0, LARGE_WIDTH, height);
 
-          } else if (mapText.title !== '' && mapText.disclaimer !== '') {
-              var height = DEFAULT_HEIGHT + 4;
-              pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                  'png', 0, 0, DEFAULT_WIDTH, height);
+          var pad1 = 29;
+          pdf.setFontSize(pad1 - 8);
+          pdf.text(mapText.title, MARGINS, height + pad1);
 
-              var pad1 = 23;
-              pdf.setFontSize(pad1 - 8);
-              pdf.text(mapText.title, MARGINS, height + pad1);
-
-              var pad2 = 18;
-              pdf.setFontSize(pad2 - 8);
-              var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
-              pdf.text(MARGINS, height + pad1 + pad2, lines);
-          }
-
-          pdf.save('map.pdf');
-        } else {
-            if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
-                pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                    'png', 0, 0, LARGE_WIDTH, LARGE_HEIGHT);
-
-                var pad1 = 26;
-                pdf.setFontSize(pad1 - 5);
-                pdf.text(mapText.title, MARGINS, LARGE_HEIGHT + pad1);
-
-                var pad2 = 22;
-                pdf.setFontSize(pad2 - 6);
-                pdf.text(mapText.subtitle, MARGINS, LARGE_HEIGHT + pad1 + pad2);
-
-                var pad3 = 19;
-                pdf.setFontSize(pad3 - 6);
-                var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
-                pdf.text(MARGINS, LARGE_HEIGHT + pad1 + pad2 + pad3, lines);
-
-            } else if (mapText.title !== '' && mapText.disclaimer !== '') {
-              var height = LARGE_HEIGHT + 4;
-              pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                  'png', 0, 0, LARGE_WIDTH, height);
-
-              var pad1 = 29;
-              pdf.setFontSize(pad1 - 8);
-              pdf.text(mapText.title, MARGINS, height + pad1);
-
-              var pad2 = 21;
-              pdf.setFontSize(pad2 - 8);
-              var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
-              pdf.text(MARGINS, height + pad1 + pad2, lines);
-          }
-            pdf.save('map.pdf');
-        }
+          var pad2 = 21;
+          pdf.setFontSize(pad2 - 8);
+          var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
+          pdf.text(MARGINS, height + pad1 + pad2, lines);
+      }
+        pdf.save('map.pdf');
+    }
     }
 }
 
