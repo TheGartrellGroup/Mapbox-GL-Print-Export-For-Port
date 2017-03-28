@@ -1,5 +1,20 @@
 'use strict';
 
+// in inches
+var default_height = 7.3,
+    large_height = 9.5,
+    legend_width = 2.5;
+
+const DEFAULT_HEIGHT = default_height * 72;
+const DEFAULT_WIDTH = 792;
+const DEFAULT_RATIO = DEFAULT_WIDTH / DEFAULT_HEIGHT;
+
+const LARGE_HEIGHT = large_height * 72;
+const LARGE_WIDTH = 1224 - (legend_width * 72);
+const LARGE_RATIO = LARGE_WIDTH / LARGE_HEIGHT;
+
+const MARGINS = 20;
+
 function PrintControl(options) {
   this.options = options;
 }
@@ -53,10 +68,10 @@ PrintControl.prototype.watchDimensions = function(map) {
     $(document).ready(function() {
         $('input[type=radio][name=dimensions]').change(function() {
             if (this.value === 'default') {
-                that.cropper.cropper('setAspectRatio', 1.294)
+                that.cropper.cropper('setAspectRatio', DEFAULT_RATIO)
             }
             else if (this.value == 'large') {
-                that.cropper.cropper('setAspectRatio', 1.545)
+                that.cropper.cropper('setAspectRatio', LARGE_RATIO)
             }
         });
     });
@@ -73,7 +88,7 @@ PrintControl.prototype.initializeCropper = function (e) {
     exportView.css('max-width', '100%')
 
     this.cropper = exportView.cropper({
-        aspectRatio: 1.294/1,
+        aspectRatio: DEFAULT_RATIO,
         zoomable: false,
         zoomOnWheel: false,
         minContainerHeight: 300,
@@ -100,7 +115,7 @@ PrintControl.prototype.onPrintDown = function (e) {
 
 PrintControl.prototype.printCanvas = function(type, size, mapText, zoom, center, bearing) {
     var _this = this;
-    var dimensions = (size === 'default') ? [612, 792] : [1056, 1632];
+    var dimensions = (size === 'default') ? [612, 792] : [792, 1224];
 
     if (type === 'png') {
         var mapCanvas = map.getCanvas();
@@ -122,26 +137,71 @@ PrintControl.prototype.printCanvas = function(type, size, mapText, zoom, center,
         });
 
         if (size === 'default') {
-            if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
-                var mar = 20;
+          if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
+              pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+                  'png', 0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
-                pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                    'png', 0, 0, 792, 504);
-                pdf.setFontSize(20);
-                pdf.text(mapText.title, mar, 528);
+              var pad1 = 20;
+              pdf.setFontSize(pad1 - 5);
+              pdf.text(mapText.title, MARGINS, DEFAULT_HEIGHT + pad1);
 
-                pdf.setFontSize(16);
-                pdf.text(mapText.subtitle, mar, 548);
+              var pad2 = 16;
+              pdf.setFontSize(pad2 - 2);
+              pdf.text(mapText.subtitle, MARGINS, DEFAULT_HEIGHT + pad1 + pad2);
 
-                pdf.setFontSize(12);
-                var lines = pdf.splitTextToSize(mapText.disclaimer, dimensions[1] - (mar * 2));
-                pdf.text(mar, 564, lines);
-            }
+              var pad3 = 13;
+              pdf.setFontSize(pad3 - 3);
+              var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
+              pdf.text(MARGINS, DEFAULT_HEIGHT + pad1 + pad2 + pad3, lines);
 
-            pdf.save('foo.pdf');
+          } else if (mapText.title !== '' && mapText.disclaimer !== '') {
+              var height = DEFAULT_HEIGHT + 4;
+              pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+                  'png', 0, 0, DEFAULT_WIDTH, height);
+
+              var pad1 = 23;
+              pdf.setFontSize(pad1 - 8);
+              pdf.text(mapText.title, MARGINS, height + pad1);
+
+              var pad2 = 18;
+              pdf.setFontSize(pad2 - 8);
+              var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
+              pdf.text(MARGINS, height + pad1 + pad2, lines);
+          }
+
+          pdf.save('map.pdf');
         } else {
-            pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                'png', 10, 10, 1430, 960);
+            if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
+                pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+                    'png', 0, 0, LARGE_WIDTH, LARGE_HEIGHT);
+
+                var pad1 = 26;
+                pdf.setFontSize(pad1 - 5);
+                pdf.text(mapText.title, MARGINS, LARGE_HEIGHT + pad1);
+
+                var pad2 = 22;
+                pdf.setFontSize(pad2 - 6);
+                pdf.text(mapText.subtitle, MARGINS, LARGE_HEIGHT + pad1 + pad2);
+
+                var pad3 = 19;
+                pdf.setFontSize(pad3 - 6);
+                var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
+                pdf.text(MARGINS, LARGE_HEIGHT + pad1 + pad2 + pad3, lines);
+
+            } else if (mapText.title !== '' && mapText.disclaimer !== '') {
+              var height = LARGE_HEIGHT + 4;
+              pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
+                  'png', 0, 0, LARGE_WIDTH, height);
+
+              var pad1 = 29;
+              pdf.setFontSize(pad1 - 8);
+              pdf.text(mapText.title, MARGINS, height + pad1);
+
+              var pad2 = 21;
+              pdf.setFontSize(pad2 - 8);
+              var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
+              pdf.text(MARGINS, height + pad1 + pad2, lines);
+          }
             pdf.save('map.pdf');
         }
     }
