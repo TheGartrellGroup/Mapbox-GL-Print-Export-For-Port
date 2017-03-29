@@ -193,7 +193,7 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, LARGE_HEIGHT + pad1 + pad2 + pad3, lines);
 
-            var pad4 = 22;
+            var pad4 = 23;
             var startLegend = LARGE_WIDTH + 6;
             pdf.setFontSize(pad4 - 6);
             pdf.text('Legend', startLegend, pad4);
@@ -209,7 +209,7 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             pdf.setFontSize(pad1 - 8);
             pdf.text(mapText.title, MARGINS, height + pad1);
 
-            var pad2 = 21;
+            var pad2 = 22;
             pdf.setFontSize(pad2 - 8);
             var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, height + pad1 + pad2, lines);
@@ -223,12 +223,12 @@ PrintControl.prototype.buildLegend = function (width, height, pdf) {
 
     // map layers
     var layers = map.getStyle().layers.filter(function(lyr) {
-        return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') != 0)
+        return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1 && lyr.layout.visibility === 'visible')
     });
 
     // layer config
     var lyrConfig = map.lyrs;
-    var labelSize = 12;
+    var labelSize = 14;
     var startingWidth = width + 2;
     var startingHeight = height + 8;
 
@@ -241,16 +241,28 @@ PrintControl.prototype.buildLegend = function (width, height, pdf) {
     pdf.setFontSize(labelSize);
 
     for (var i = layers.length - 1; i >= 0; i--) {
+        var startingHeight = startingHeight + labelSize;
         var layer = layers[i];
         var nonGroupedLayer = lyrConfig.filter(function(lyr) {
             return (lyr.id === layer.id)
         })
 
-        if (nonGroupedLayer.length > 0 && layer.layout.visibility === 'visible') {
+        if (nonGroupedLayer.length) {
             var mapLayer = nonGroupedLayer[0];
-            pdf.text(mapLayer.name, startingWidth, startingHeight);
+            if ($('#' + mapLayer.id + ' img').length) {
+                var canvas = document.createElement("canvas");
+                var context = canvas.getContext('2d');
 
-        } else if (layer.layout.visibility === 'visible') {
+                var img = new Image();
+                img.src = $('#' + mapLayer.id + ' img').attr('src');
+                img.onload = function() {
+                    context.drawImage(img, 15,15);
+                }
+                pdf.addImage(context.toDataURL('image/png'),
+                    'png',startingWidth, startingHeight);
+            }
+            pdf.text(mapLayer.name, startingWidth + 5, startingHeight);
+        } else {
             var foundParent = groupLayers.filter(function(lay) {
                 return lay.layerGroup.filter(function(ly) {
                     if (ly.id === layer.name) {
@@ -260,14 +272,33 @@ PrintControl.prototype.buildLegend = function (width, height, pdf) {
             })
 
             if (foundParent.length > 0) {
-                var childLayers = foundParent[0].layerGroup;
-                pdf.text(foundParent[0].name, startingWidth, startingHeight)
-                for (var c = 0; c < childLayers.length; c++) {
-                    pdf.text(childLayers[c].name, startingWidth + 3, startingHeight)
-                };
+                if (groupLayerTracker.indexOf(layer.id) === -1) {
+                  var childLayers = foundParent[0].layerGroup;
+                  pdf.text(foundParent[0].name, startingWidth, startingHeight)
+                  for (var c = 0; c < childLayers.length; c++) {
+                      var childHeight = startingHeight + (c * labelSize) + ((c+1) * 4);
+                      groupLayerTracker.push(childLayers[c].id);
+
+                      if ($('#' + childLayers[c].id + ' img').length) {
+                          var canvas = document.createElement("canvas");
+                          var context = canvas.getContext('2d');
+
+                          var img = new Image();
+                          img.src = $('#' + childLayers[c].id + ' img').attr('src');
+                          img.onload = function() {
+                              context.drawImage(img, 15,15);
+                          }
+                          pdf.addImage(context.toDataURL('image/png'),
+                              'png',startingWidth, startingHeight);
+                      }
+
+                      pdf.text(childLayers[c].name, startingWidth + 7, childHeight + labelSize);
+                  };
+                  startingHeight = childHeight;
+                }
             }
         }
 
-        startingHeight = startingHeight + startingHeight;
+        startingHeight = startingHeight + 4;
     };
 }
