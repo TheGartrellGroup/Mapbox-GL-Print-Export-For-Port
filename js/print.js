@@ -219,7 +219,8 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
 }
 
 PrintControl.prototype.buildLegend = function (width, height, pdf) {
-    var map = this._map;
+    var _this = this;
+    var map = _this._map;
 
     // map layers
     var layers = map.getStyle().layers.filter(function(lyr) {
@@ -249,19 +250,12 @@ PrintControl.prototype.buildLegend = function (width, height, pdf) {
 
         if (nonGroupedLayer.length) {
             var mapLayer = nonGroupedLayer[0];
-            if ($('#' + mapLayer.id + ' img').length) {
-                var canvas = document.createElement("canvas");
-                var context = canvas.getContext('2d');
-
-                var img = new Image();
-                img.src = $('#' + mapLayer.id + ' img').attr('src');
-                img.onload = function() {
-                    context.drawImage(img, 15,15);
-                }
-                pdf.addImage(context.toDataURL('image/png'),
-                    'png',startingWidth, startingHeight);
+            var elm = '#' + mapLayer.id + ' i';
+            // font-awesome icon?
+            if ($(elm).length) {
+                _this.addFontAwesome(elm, pdf, startingWidth, startingHeight);
             }
-            pdf.text(mapLayer.name, startingWidth + 5, startingHeight);
+            pdf.text(mapLayer.name, startingWidth + 18, startingHeight);
         } else {
             var foundParent = groupLayers.filter(function(lay) {
                 return lay.layerGroup.filter(function(ly) {
@@ -274,25 +268,47 @@ PrintControl.prototype.buildLegend = function (width, height, pdf) {
             if (foundParent.length > 0) {
                 if (groupLayerTracker.indexOf(layer.id) === -1) {
                   var childLayers = foundParent[0].layerGroup;
-                  pdf.text(foundParent[0].name, startingWidth, startingHeight)
+                  pdf.text(foundParent[0].name, startingWidth + 18, startingHeight)
                   for (var c = 0; c < childLayers.length; c++) {
                       var childHeight = startingHeight + (c * labelSize) + ((c+1) * 4);
                       groupLayerTracker.push(childLayers[c].id);
 
-                      if ($('#' + childLayers[c].id + ' img').length) {
-                          var canvas = document.createElement("canvas");
-                          var context = canvas.getContext('2d');
-
-                          var img = new Image();
-                          img.src = $('#' + childLayers[c].id + ' img').attr('src');
-                          img.onload = function() {
-                              context.drawImage(img, 15,15);
-                          }
-                          pdf.addImage(context.toDataURL('image/png'),
-                              'png',startingWidth, startingHeight);
+                      var elm = '#' + childLayers[c].id + ' i';
+                      if ($(elm).length) {
+                        _this.addFontAwesome(elm, pdf, startingWidth + 22, childHeight - 4);
                       }
+                      // if ($('#' + childLayers[c].id + ' img').length) {
+                      //     var img = new Image();
 
-                      pdf.text(childLayers[c].name, startingWidth + 7, childHeight + labelSize);
+                      //     img.onload = function() {
+                      //       var canvas = document.createElement('CANVAS');
+                      //       var ctx = canvas.getContext('2d');
+                      //       var dataURL;
+
+                      //       canvas.height = this.height;
+                      //       canvas.width = this.width;
+                      //       ctx.drawImage(this, 0, 0);
+                      //       dataURL = canvas.toDataURL(outputFormat);
+                      //       callback(dataURL);
+                      //     };
+
+                      //     var canvas = document.createElement("canvas");
+                      //     canvas.width = 15;
+                      //     canvas.height = 15;
+
+                      //     var ctx = canvas.getContext("2d");
+
+
+                      //     img.onload = function () {
+                      //         ctx.drawImage(img, 0, 0);
+                      //     }
+                      //     img.src = $('#' + childLayers[c].id + ' img').attr('src');
+
+                      //     pdf.addImage(canvas.toDataURL('image/png'),
+                      //         'png',startingWidth, startingHeight);
+                      // }
+
+                      pdf.text(childLayers[c].name, startingWidth + 40, childHeight + labelSize);
                   };
                   startingHeight = childHeight;
                 }
@@ -301,4 +317,24 @@ PrintControl.prototype.buildLegend = function (width, height, pdf) {
 
         startingHeight = startingHeight + 4;
     };
+}
+
+PrintControl.prototype.addFontAwesome = function (elm, pdf, startingWidth, startingHeight) {
+    var character = window.getComputedStyle(
+        document.querySelector(elm), ':before'
+    ).getPropertyValue('content').replace(/['"]+/g, '');
+
+    var canvas = document.createElement("canvas");
+    canvas.width = 36;
+    canvas.height = 36;
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = document.querySelector(elm).style.color;
+    ctx.font = "18px FontAwesome";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "start";
+
+    ctx.fillText(character, 9, 9);
+    var dataURL = canvas.toDataURL('image/png')
+    pdf.addImage(dataURL,
+        'png',startingWidth - 4, startingHeight - 18);
 }
