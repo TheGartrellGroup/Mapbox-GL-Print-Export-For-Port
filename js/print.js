@@ -157,6 +157,9 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, DEFAULT_HEIGHT + pad1 + pad2 + pad3, lines);
 
+            //north arrow
+            _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
+
         } else if (mapText.title !== '' && mapText.disclaimer !== '') {
             var height = DEFAULT_HEIGHT + 4;
             pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
@@ -170,6 +173,9 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             pdf.setFontSize(pad2 - 8);
             var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, height + pad1 + pad2, lines);
+
+            //north arrow
+            _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
         }
     } else {
         if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
@@ -196,6 +202,9 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
 
             this.buildLegend(startLegend, pad4, pdf);
 
+            //north arrow
+            _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
+
         } else if (mapText.title !== '' && mapText.disclaimer !== '') {
             var height = LARGE_HEIGHT + 4;
             pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
@@ -209,12 +218,57 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             pdf.setFontSize(pad2 - 8);
             var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, height + pad1 + pad2, lines);
+
+            this.buildLegend(startLegend, pad4, pdf);
+
+            //north arrow
+            _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
         }
     }
     setTimeout(function() {
       pdf.save('map.pdf');
     }, 1500);
 }
+
+PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) {
+    var _this = this;
+    var canvas = document.createElement("canvas");
+    canvas.id = 'north-arrow-canvas';
+    if (size === 'default') {
+      canvas.width = 35;
+      canvas.height = 35;
+    } else {
+      canvas.width = 50;
+      canvas.height = 50;
+    }
+
+    canvas.attributes.h = height + pad;
+    canvas.attributes.w = width;
+    canvas.attributes.s = size;
+
+    var ctx = canvas.getContext("2d");
+    var img = new Image();
+
+    img.onload = function() {
+        // roate north arrow
+        ctx.translate(canvas.width / 2, canvas.height / 2)
+        ctx.rotate(_this._map.getBearing() * -1 * Math.PI/180);
+        ctx.drawImage(img, canvas.width / -2, canvas.height / -2, canvas.width, canvas.height);
+
+        var dataURL = canvas.toDataURL('image/png');
+        console.log(dataURL)
+        if (canvas.attributes.s === 'default') {
+          var w = canvas.attributes.w - canvas.width * 3.5;
+          var h = canvas.attributes.h - 15;
+        } else {
+          var w = canvas.attributes.w + canvas.width * 1.5;
+          var h = canvas.attributes.h + canvas.height * 2.75;
+        }
+        pdf.addImage(dataURL, 'png', w , h);
+    }
+    img.crossOrigin = '';
+    img.src = this.options.northArrow;
+  }
 
 PrintControl.prototype.buildLegend = function(width, height, pdf) {
     var _this = this;
