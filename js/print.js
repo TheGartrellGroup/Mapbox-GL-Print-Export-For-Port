@@ -219,7 +219,12 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, height + pad1 + pad2, lines);
 
-            this.buildLegend(startLegend, pad4, pdf);
+            var pad3 = 23;
+            var startLegend = LARGE_WIDTH + 6;
+            pdf.setFontSize(pad3 - 6);
+            pdf.text('Legend', startLegend, pad3);
+
+            this.buildLegend(startLegend, pad3, pdf);
 
             //north arrow
             _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
@@ -234,6 +239,7 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
     var _this = this;
     var canvas = document.createElement("canvas");
     canvas.id = 'north-arrow-canvas';
+
     if (size === 'default') {
       canvas.width = 35;
       canvas.height = 35;
