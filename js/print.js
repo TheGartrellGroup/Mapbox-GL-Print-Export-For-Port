@@ -1,9 +1,9 @@
 'use strict';
-
 // in inches
 var default_height = 7.3,
     large_height = 9.5,
-    legend_width = 2.5;
+    legend_width = 2.5,
+    CANVAS_RATIO = '';
 
 const DEFAULT_HEIGHT = default_height * 72;
 const DEFAULT_WIDTH = 792;
@@ -76,7 +76,6 @@ PrintControl.prototype.watchDimensions = function(map) {
     });
 }
 
-
 PrintControl.prototype.initializeCropper = function(e) {
     if (this.cropper && this.cropper.cropper()) {
         this.cropper.cropper('destroy');
@@ -87,11 +86,14 @@ PrintControl.prototype.initializeCropper = function(e) {
     exportView.css('max-width', '100%')
 
     this.cropper = exportView.cropper({
-        aspectRatio: DEFAULT_RATIO,
         zoomable: false,
         zoomOnWheel: false,
         minContainerHeight: 300,
         minContainerWidth: 568,
+        autoCropArea: 0.99,
+        aspectRatio: DEFAULT_RATIO,
+        cropBoxResizable: false,
+        dragMode: 'none'
     })
 }
 
@@ -130,60 +132,13 @@ PrintControl.prototype.printPNG = function(pdf) {
 
             var task = page.render({canvasContext: context, viewport: viewport})
             task.promise.then(function(){
-              canvas.toDataURL('image/png');
-              canvas.toBlob(function(blob) {
+                canvas.toDataURL('image/png');
+                canvas.toBlob(function(blob) {
                   saveAs(blob, 'map.png');
-              })
+                })
             });
-
-            // var img = new Image();
-
-            // img.onload = function() {
-            //     context.drawImage(img, 0, 0);
-
-            //     canvas.toBlob(function(blob) {
-            //         saveAs(blob, 'map.png');
-            //     })
-            // }
-            // img.src = canvas.toDataURL('image/png');
-
         })
-
     });
-    // function b64toBlob(b64Data, contentType, sliceSize) {
-    //   contentType = contentType || '';
-    //   sliceSize = sliceSize || 512;
-
-    //   var byteCharacters = atob(b64Data);
-    //   var byteArrays = [];
-
-    //   for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    //     var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-    //     var byteNumbers = new Array(slice.length);
-    //     for (var i = 0; i < slice.length; i++) {
-    //       byteNumbers[i] = slice.charCodeAt(i);
-    //     }
-
-    //     var byteArray = new Uint8Array(byteNumbers);
-
-    //     byteArrays.push(byteArray);
-    //   }
-
-    //   var blob = new Blob(byteArrays, {type: contentType});
-    //   return blob;
-    // }
-
-    // var URI = pdf.output('datauri');
-    // var b64Data = URI.toString.slice(28, -1);
-    // var contentType = 'image/png';
-
-    // var blob = b64toBlob(b64Data, contentType);
-    // saveAs(blob, 'map.png')
-
-
-
-    // }
 }
 
 PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing, isPNG) {
@@ -216,6 +171,10 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
             //north arrow
             _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
 
+            //scalebar
+            _this.addScaleBar(pdf, size, DEFAULT_HEIGHT, DEFAULT_WIDTH);
+
+
         } else if (mapText.title !== '' && mapText.disclaimer !== '') {
             var height = DEFAULT_HEIGHT + 4;
             pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
@@ -232,6 +191,9 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
 
             //north arrow
             _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
+
+            //scalebar
+            _this.addScaleBar(pdf, size, DEFAULT_HEIGHT, DEFAULT_WIDTH);
         }
     } else {
         if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {
@@ -261,6 +223,9 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
             //north arrow
             _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
 
+            //scalebar
+            _this.addScaleBar(pdf, size, LARGE_HEIGHT, LARGE_WIDTH);
+
         } else if (mapText.title !== '' && mapText.disclaimer !== '') {
             var height = LARGE_HEIGHT + 4;
             pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
@@ -284,6 +249,9 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
 
             //north arrow
             _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
+
+            //scalebar
+            _this.addScaleBar(pdf, size, LARGE_HEIGHT, LARGE_WIDTH);
         }
     }
     if (!isPNG) {
@@ -295,7 +263,6 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
             _this.printPNG(pdf);
         }, 1500)
     }
-
 }
 
 PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) {
@@ -316,8 +283,9 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
     canvas.attributes.s = size;
 
     var ctx = canvas.getContext("2d");
-    var img = new Image();
 
+    var img = new Image();
+    img.src = _this.options.northArrow;
     img.onload = function() {
         // roate north arrow
         ctx.translate(canvas.width / 2, canvas.height / 2)
@@ -330,15 +298,14 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
           var w = canvas.attributes.w - canvas.width * 3.5;
           var h = canvas.attributes.h - 15;
         } else {
-          var w = canvas.attributes.w + canvas.width * 1.5;
+          var w = canvas.attributes.w + canvas.width * 2.25;
           var h = canvas.attributes.h + canvas.height * 2.75;
         }
         pdf.addImage(dataURL, 'png', w , h);
     }
-
     img.crossOrigin = '';
-    img.src = this.options.northArrow;
-  }
+
+}
 
 PrintControl.prototype.buildLegend = function(width, height, pdf) {
     var _this = this;
@@ -438,6 +405,33 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
         }
         startingHeight = startingHeight + 4;
     }
+}
+
+PrintControl.prototype.addScaleBar = function(pdf, size, h, w) {
+    var _this = this;
+    var map = _this._map;
+    var mapCanvas = map.getCanvas();
+    var cropperCanvas =  _this.cropper.cropper('getCroppedCanvas');
+    var scaleElm = $('.mapboxgl-ctrl.mapboxgl-ctrl-scale')[0];
+
+    // var cropWidth = cropperCanvas.width;
+    // var cropHeight = cropperCanvas.height;
+    // var cropRatio = cropWidth / cropHeight;
+
+    // var mapWidth = mapCanvas.width;
+    // var mapHeight = mapCanvas.height;
+    // var mapRatio = mapWidth / mapHeight;
+
+    // CANVAS_RATIO = 1 / (mapRatio / cropRatio);
+
+    html2canvas(scaleElm).then(function(canvas) {
+        var dataURL = canvas.toDataURL('image/png');
+        if (size === 'default') {
+            pdf.addImage(dataURL, 'png', w - MARGINS * 3.75,  h + 12);
+        } else {
+            pdf.addImage(dataURL, 'png', w - MARGINS * 3, h + 18)
+        }
+    })
 }
 
 PrintControl.prototype.addImage = function(imgElm, id, pdf, startingWidth, startingHeight) {
