@@ -392,6 +392,10 @@ co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
 
+coffee-script@latest:
+  version "1.12.4"
+  resolved "https://registry.yarnpkg.com/coffee-script/-/coffee-script-1.12.4.tgz#fe1bced97fe1fb3927b998f2b45616e0658be1ff"
+
 combined-stream@^1.0.5, combined-stream@~1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
@@ -2073,6 +2077,12 @@ pbf@^1.3.2:
   dependencies:
     ieee754 "^1.1.6"
     resolve-protobuf-schema "^2.0.0"
+
+pdf.js@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/pdf.js/-/pdf.js-0.1.0.tgz#d0844642efd2b01fde355b22a7cc3432382bd64e"
+  dependencies:
+    coffee-script latest
 
 performance-now@^0.2.0:
   version "0.2.0"

@@ -108,29 +108,85 @@ PrintControl.prototype.onPrintDown = function(e) {
     var zoom = map.getZoom();
     var center = map.getCenter();
     var bearing = map.getBearing();
+    var isPNG
 
-    type === 'png' ? _this.printPNG(size, mapText, zoom, center, bearing) : _this.printPDF(size, mapText, zoom, center, bearing)
+    type === 'png' ?  isPNG = true : isPNG = false
+
+    _this.printPDF(size, mapText, zoom, center, bearing, isPNG)
 }
 
-PrintControl.prototype.printPNG = function(size, mapText, zoom, center, bearing) {
-    var mapCanvas = this.cropper.cropper('getCroppedCanvas');
+PrintControl.prototype.printPNG = function(pdf) {
+    var _this = this;
 
-    if (size === 'default') {
-        if (mapText.title !== '' && mapText.subtitle !== '' && mapText.disclaimer !== '') {}
-        var tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = _this.toPixels(mapCanvas.width);
-        tmpCanvas.height = _this.toPixels(mapCanvas[0]);
+    PDFJS.getDocument(pdf.output('datauri')).then(function(doc) {
+        doc.getPage(1).then(function(page) {
+            var scale = 1.5;
+            var viewport = page.getViewport(scale);
 
-        var ctx = tmpCanvas.getContext('2d');
-        ctx.drawImage(mapCanvas, 10, 10);
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-        tmpCanvas.toBlob(function(blob) {
-            saveAs(blob, 'map.png');
+            var task = page.render({canvasContext: context, viewport: viewport})
+            task.promise.then(function(){
+              canvas.toDataURL('image/png');
+              canvas.toBlob(function(blob) {
+                  saveAs(blob, 'map.png');
+              })
+            });
+
+            // var img = new Image();
+
+            // img.onload = function() {
+            //     context.drawImage(img, 0, 0);
+
+            //     canvas.toBlob(function(blob) {
+            //         saveAs(blob, 'map.png');
+            //     })
+            // }
+            // img.src = canvas.toDataURL('image/png');
+
         })
-    }
+
+    });
+    // function b64toBlob(b64Data, contentType, sliceSize) {
+    //   contentType = contentType || '';
+    //   sliceSize = sliceSize || 512;
+
+    //   var byteCharacters = atob(b64Data);
+    //   var byteArrays = [];
+
+    //   for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    //     var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    //     var byteNumbers = new Array(slice.length);
+    //     for (var i = 0; i < slice.length; i++) {
+    //       byteNumbers[i] = slice.charCodeAt(i);
+    //     }
+
+    //     var byteArray = new Uint8Array(byteNumbers);
+
+    //     byteArrays.push(byteArray);
+    //   }
+
+    //   var blob = new Blob(byteArrays, {type: contentType});
+    //   return blob;
+    // }
+
+    // var URI = pdf.output('datauri');
+    // var b64Data = URI.toString.slice(28, -1);
+    // var contentType = 'image/png';
+
+    // var blob = b64toBlob(b64Data, contentType);
+    // saveAs(blob, 'map.png')
+
+
+
+    // }
 }
 
-PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing) {
+PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing, isPNG) {
     var _this = this;
     var dimensions = (size === 'default') ? [612, 792] : [792, 1224];
     var pdf = new jsPDF({
@@ -230,9 +286,16 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing)
             _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
         }
     }
-    setTimeout(function() {
-      pdf.save('map.pdf');
-    }, 1500);
+    if (!isPNG) {
+        setTimeout(function() {
+          pdf.save('map.pdf');
+        }, 1500);
+    } else {
+        setTimeout(function() {
+            _this.printPNG(pdf);
+        }, 1500)
+    }
+
 }
 
 PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) {
@@ -258,11 +321,11 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
     img.onload = function() {
         // roate north arrow
         ctx.translate(canvas.width / 2, canvas.height / 2)
-        ctx.rotate(_this._map.getBearing() * -1 * Math.PI/180);
+        ctx.rotate(_this._map.getBearing() * -1 * Math.PI / 180);
         ctx.drawImage(img, canvas.width / -2, canvas.height / -2, canvas.width, canvas.height);
 
         var dataURL = canvas.toDataURL('image/png');
-        console.log(dataURL)
+
         if (canvas.attributes.s === 'default') {
           var w = canvas.attributes.w - canvas.width * 3.5;
           var h = canvas.attributes.h - 15;
@@ -272,6 +335,7 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
         }
         pdf.addImage(dataURL, 'png', w , h);
     }
+
     img.crossOrigin = '';
     img.src = this.options.northArrow;
   }
