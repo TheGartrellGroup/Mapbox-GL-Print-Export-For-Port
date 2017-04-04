@@ -24,10 +24,6 @@
           <h4 class="modal-title">Print Modal</h4>
         </div>
         <div class="modal-body">
-          <!-- cropper view -->
-          <div class="preview-container">
-              <img id='export-view' />
-          </div>
           <!-- print form -->
           <form class="form-horizontal container-fluid" id="print-form">
             <div class="row">
@@ -62,15 +58,11 @@
                 </div>
               </div>
 
-              <!-- title & subtitle -->
+              <!-- title -->
               <div class="col">
-                <div class="form-group col-sm-6">
-                  <label class="col-md-4 control-label" for="export-title">Title</label>
+                <div class="form-group col-sm-12">
+                  <label class="col-md control-label" for="export-title">Title</label>
                   <input id="export-title" name="export-title" type="text" placeholder="My Title" class="form-control input-md">
-                </div>
-                <div class="form-group col-sm-6">
-                  <label class="col-md-4 control-label" for="export-subtitle">Subtitle</label>
-                  <input id="export-subtitle" name="export-subtitle" type="text" placeholder="My Subtitle" class="form-control input-md">
                 </div>
               </div>
             </div>
@@ -86,14 +78,14 @@
 <script src='node_modules/mapbox-gl/dist/mapbox-gl.js'></script>
 <script src='node_modules/MapboxGL-Layer-Tree/dist/js/scripts.min.js'></script>
 <script src='node_modules/bootstrap/dist/js/bootstrap.min.js'></script>
-<script src='node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'></script>
+<!-- <script src='node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'></script>
 <script src='node_modules/jspdf/dist/jspdf.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/1.7.393/pdf.js'></script>
+<script src='node_modules/pdfjs-dist/build/pdf.combined.js'></script>
 <script src='node_modules/filesaver.js/FileSaver.min.js'></script>
 <script src='node_modules/html2canvas/dist/html2canvas.min.js'></script>
-<script src='node_modules/cropper/dist/cropper.min.js'></script>
-<script src='js/print.js'></script>
-<!-- <script src='dist/js/scripts.min.js'></script> -->
+<script src='node_modules/cropper/dist/cropper.min.js'></script> -->
+<!-- <script src='js/print.js'></script> -->
+<script src='dist/js/scripts.min.js'></script>
 <script src='js/app.js'></script>
 
 </body>

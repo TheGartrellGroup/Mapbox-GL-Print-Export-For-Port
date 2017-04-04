@@ -22,7 +22,7 @@ gulp.task('watch', function(){
 
 //minify js
 gulp.task('scripts', function() {
-  gulp.src(['node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.min.js', 'node_modules/jspdf/dist/jspdf.min.js', 'node_modules/filesaver.js/FileSaver.min.js', 'node_modules/cropper/dist/cropper.min.js', 'js/print.js'])
+  gulp.src(['node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.min.js', 'node_modules/jspdf/dist/jspdf.min.js', 'node_modules/pdfjs-dist/build/pdf.combined.js', 'node_modules/filesaver.js/FileSaver.min.js', 'node_modules/html2canvas/dist/html2canvas.min.js', 'node_modules/cropper/dist/cropper.min.js', 'js/print.js'])
     .pipe(concat('scripts.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('dist/js'))

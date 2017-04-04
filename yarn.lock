@@ -182,6 +182,10 @@ beeper@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/beeper/-/beeper-1.1.1.tgz#e6d5ea8c5dad001304a70b22638447f69cb2f809"
 
+big.js@^3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.1.3.tgz#4cada2193652eb3ca9ec8e55c9015669c9806978"
+
 blueimp-canvas-to-blob@^3.7.0:
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/blueimp-canvas-to-blob/-/blueimp-canvas-to-blob-3.7.0.tgz#6e985b935c0223410c3a2ad96c0ba3ea214c2b13"
@@ -392,10 +396,6 @@ co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
 
-coffee-script@latest:
-  version "1.12.4"
-  resolved "https://registry.yarnpkg.com/coffee-script/-/coffee-script-1.12.4.tgz#fe1bced97fe1fb3927b998f2b45616e0658be1ff"
-
 combined-stream@^1.0.5, combined-stream@~1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
@@ -573,6 +573,10 @@ ee-first@1.0.5:
 ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
+
+emojis-list@^2.0.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"
 
 encodeurl@~1.0.1:
   version "1.0.1"
@@ -1380,6 +1384,10 @@ json-stringify-safe@~5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
 
+json5@^0.5.0:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
+
 jsonify@~0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
@@ -1452,6 +1460,14 @@ load-json-file@^1.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
     strip-bom "^2.0.0"
+
+loader-utils@^1.0.2:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-1.1.0.tgz#c98aef488bcceda2ffb5e2de646d6a754429f5cd"
+  dependencies:
+    big.js "^3.1.3"
+    emojis-list "^2.0.0"
+    json5 "^0.5.0"
 
 lodash._basecopy@^3.0.0:
   version "3.0.1"
@@ -1900,6 +1916,10 @@ negotiator@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
 
+node-ensure@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/node-ensure/-/node-ensure-0.0.0.tgz#ecae764150de99861ec5c810fd5d096b183932a7"
+
 node.extend@^1.0.10:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/node.extend/-/node.extend-1.1.6.tgz#a7b882c82d6c93a4863a5504bd5de8ec86258b96"
@@ -2082,11 +2102,12 @@ pbf@^1.3.2:
     ieee754 "^1.1.6"
     resolve-protobuf-schema "^2.0.0"
 
-pdf.js@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/pdf.js/-/pdf.js-0.1.0.tgz#d0844642efd2b01fde355b22a7cc3432382bd64e"
+pdfjs-dist@^1.7.414:
+  version "1.7.414"
+  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-1.7.414.tgz#ca8ce42d1d2f296ca6038de80359a171a90a3a9d"
   dependencies:
-    coffee-script latest
+    node-ensure "^0.0.0"
+    worker-loader "^0.8.0"
 
 performance-now@^0.2.0:
   version "0.2.0"
@@ -2878,6 +2899,12 @@ wordwrap@0.0.2:
 wordwrap@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
+
+worker-loader@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/worker-loader/-/worker-loader-0.8.0.tgz#13582960dcd7d700dc829d3fd252a7561696167e"
+  dependencies:
+    loader-utils "^1.0.2"
 
 wrappy@1:
   version "1.0.2"
