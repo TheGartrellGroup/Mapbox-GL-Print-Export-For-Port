@@ -15,61 +15,31 @@ const LARGE_RATIO = LARGE_WIDTH / LARGE_HEIGHT;
 
 const MARGINS = 20;
 
-function PrintControl(options) {
-    this.options = options;
-}
+function PrintControl() {}
 
-PrintControl.prototype.onAdd = function(map) {
-    this._map = map;
-    this._container = document.createElement('div');
-    this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group print';
+PrintControl.prototype.initialize = function(map, options) {
+    var _this = this;
 
-    this._printBtn = document.createElement('button');
-    this._printBtn.className = 'mapboxgl-ctrl-icon mapboxgl-ctrl-print';
+    _this._map = map;
+    _this.options = options;
 
-    this._container.appendChild(this._printBtn);
-    this._container.style.display = 'none';
+    if ($('.cropper-preview-container').length === 0) {
+        _this._cropperContainer = document.createElement('div');
+        _this._cropperContainer.className = 'cropper-preview-container';
+        _this._cropperContainer.style.display = 'none';
 
-    this._cropperContainer = document.createElement('div');
-    this._cropperContainer.className = 'preview-container';
-    this._cropperContainer.style.display = 'none';
+        _this._exportView = document.createElement('img');
+        _this._exportView.id = 'export-view';
 
-    this._exportView = document.createElement('img');
-    this._exportView.id = 'export-view';
+        _this._cropperContainer.appendChild(_this._exportView);
+        document.querySelector('#map-print-modal').appendChild(_this._cropperContainer);
 
-    this._cropperContainer.appendChild(this._exportView);
-    document.querySelector('#map-print-modal').appendChild(this._cropperContainer)
-    this.onReady(map);
-
-    return this._container;
-}
-
-PrintControl.prototype.onRemove = function() {
-    this.container.parentNode.removeChild(this.container);
-    this._map = null;
-    return this;
-}
-
-PrintControl.prototype.onReady = function(map) {
-    var that = this;
-
-    var layersLoaded = function() {
-        if (map.loaded()) {
-            that._printBtn.setAttribute('data-toggle', 'modal');
-            that._printBtn.setAttribute('data-target', '#map-print-modal') // #map-print-modal is the DOM  ID
-            that._printBtn.addEventListener('mousedown', that.initializeCropper.bind(that));
-
-            // export-map is the primary button within the map-print-modal
-            document.querySelector('#export-map').addEventListener('mousedown', that.onPrintDown.bind(that));
-            that._container.style.display = 'block';
-            map.off('render', layersLoaded);
-
-            that.watchDimensions();
-        }
+        _this.watchDimensions();
     }
 
-    map.on('render', layersLoaded);
+    _this.createCropper();
 }
+
 
 PrintControl.prototype.watchDimensions = function(map) {
     var _this = this;
@@ -85,7 +55,7 @@ PrintControl.prototype.watchDimensions = function(map) {
     });
 }
 
-PrintControl.prototype.initializeCropper = function(e) {
+PrintControl.prototype.createCropper = function(e) {
     if (this.cropper && this.cropper.cropper()) {
         this.cropper.cropper('destroy');
     }
@@ -106,7 +76,7 @@ PrintControl.prototype.initializeCropper = function(e) {
     })
 }
 
-PrintControl.prototype.onPrintDown = function(e) {
+PrintControl.prototype.exportMap = function(e) {
     var _this = this;
 
     var type = $("form#print-form .format input[type='radio']:checked").val();

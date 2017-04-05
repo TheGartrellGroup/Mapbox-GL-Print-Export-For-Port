@@ -2,11 +2,28 @@ mapboxgl.accessToken = '';
 
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/mapbox/dark-v9',
     center: [-122.59311, 45.5930],
     preserveDrawingBuffer: true,
     zoom: 6
 });
+
+var printBtn = document.getElementById('mapboxgl-ctrl-print');
+var exportView = document.getElementById('export-map');
+
+var printOptions = {
+    disclaimer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    northArrow: '../../north_arrow.svg'
+}
+
+printBtn.onclick = function(e) {
+    PrintControl.prototype.initialize(map, printOptions)
+}
+
+exportView.onclick = function(e) {
+    PrintControl.prototype.exportMap();
+    e.preventDefault();
+}
 
 map.on('load', function () {
 
@@ -100,7 +117,7 @@ var layers =
                 'id': 'land',
                 'source': 'land',
                 'name': 'Land',
-                'icon': 'https://static.typingclub.com/m/tpmedia/img/replay-icon.png'
+                'icon': '../../north_arrow.svg'
             },
             {
                 'id': 'state-boundaries',
@@ -132,10 +149,6 @@ var layers =
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new mapboxgl.ScaleControl());
-map.addControl(new PrintControl({
-    disclaimer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    northArrow: '../../north_arrow.svg'
-}));
 map.addControl(new LayerTree({
     layers: layers
 }), 'bottom-left');
