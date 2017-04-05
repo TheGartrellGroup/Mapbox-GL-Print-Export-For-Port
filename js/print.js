@@ -130,7 +130,7 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
     });
 
     if (mapText.title === '') {
-        mapText.title = 'My Map';
+        mapText.title = _this.options.defaultTitle || 'My Map';
     }
 
     if (size === 'default') {
