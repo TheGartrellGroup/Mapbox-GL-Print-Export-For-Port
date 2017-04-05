@@ -1,6 +1,6 @@
 'use strict';
 // in inches
-var default_height = 7.3,
+var default_height = 7.4,
     large_height = 9.5,
     legend_width = 2.5,
     CANVAS_RATIO = '';
@@ -13,7 +13,8 @@ const LARGE_HEIGHT = large_height * 72;
 const LARGE_WIDTH = 1224 - (legend_width * 72);
 const LARGE_RATIO = LARGE_WIDTH / LARGE_HEIGHT;
 
-const MARGINS = 20;
+const MARGINS = 12;
+const BORDER_MARGINS = 9;
 
 function PrintControl() {}
 
@@ -136,23 +137,32 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
     if (size === 'default') {
         if (mapText.disclaimer !== '') {
             var height = DEFAULT_HEIGHT + 4;
+            //map
             pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                'png', 0, 0, DEFAULT_WIDTH, height);
+                'png', BORDER_MARGINS, BORDER_MARGINS, DEFAULT_WIDTH - BORDER_MARGINS * 2, height - BORDER_MARGINS * 2);
 
-            var pad1 = 23;
-            pdf.setFontSize(pad1 - 8);
-            pdf.text(mapText.title, MARGINS, height + pad1);
+            //line divider
+            pdf.setLineWidth(1.5);
+            var pad1 = BORDER_MARGINS;
+            pdf.setDrawColor(170,170,170)
+            pdf.line(BORDER_MARGINS, DEFAULT_HEIGHT + pad1, DEFAULT_WIDTH - BORDER_MARGINS, DEFAULT_HEIGHT + pad1);
 
-            var pad2 = 18;
-            pdf.setFontSize(pad2 - 8);
+            //title
+            var pad2 = 21;
+            pdf.setFontSize(12);
+            pdf.text(mapText.title, MARGINS, height + pad1 + pad2);
+
+            //disclaimer
+            var pad3 = 14;
+            pdf.setFontSize(5);
             var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
-            pdf.text(MARGINS, height + pad1 + pad2, lines);
+            pdf.text(MARGINS, height + pad1 + pad2 + pad3, lines);
 
             //north arrow
-            _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
+            _this.addNorthArrow(DEFAULT_HEIGHT, pad1 + pad2, DEFAULT_WIDTH, size, pdf);
 
             //scalebar
-            _this.addScaleBar(pdf, size, DEFAULT_HEIGHT, DEFAULT_WIDTH);
+            _this.addScaleBar(pdf, size, (height - BORDER_MARGINS * 4), (DEFAULT_WIDTH - BORDER_MARGINS * 2));
         }
     } else {
         if (mapText.disclaimer !== '') {
@@ -177,10 +187,10 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
             this.buildLegend(startLegend, pad3, pdf);
 
             //north arrow
-            _this.addNorthArrow(DEFAULT_HEIGHT, pad1, DEFAULT_WIDTH, size, pdf);
+            _this.addNorthArrow(DEFAULT_HEIGHT, pad1 + pad2, DEFAULT_WIDTH - BORDER_MARGINS, size, pdf);
 
             //scalebar
-            _this.addScaleBar(pdf, size, LARGE_HEIGHT, LARGE_WIDTH);
+            // _this.addScaleBar(pdf, size, LARGE_HEIGHT, LARGE_WIDTH);
         }
     }
 
@@ -201,8 +211,8 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
     canvas.id = 'north-arrow-canvas';
 
     if (size === 'default') {
-      canvas.width = 35;
-      canvas.height = 35;
+      canvas.width = 30;
+      canvas.height = 30;
     } else {
       canvas.width = 50;
       canvas.height = 50;
@@ -225,8 +235,8 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
         var dataURL = canvas.toDataURL('image/png');
 
         if (canvas.attributes.s === 'default') {
-          var w = canvas.attributes.w - canvas.width * 3.5;
-          var h = canvas.attributes.h - 15;
+          var w = canvas.attributes.w - (canvas.width + 48 - BORDER_MARGINS);
+          var h = canvas.attributes.h - MARGINS;
         } else {
           var w = canvas.attributes.w + canvas.width * 2.55;
           var h = canvas.attributes.h + canvas.height * 2.75;
@@ -339,17 +349,14 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
 PrintControl.prototype.addScaleBar = function(pdf, size, h, w) {
     var _this = this;
-    var map = _this._map;
-    var mapCanvas = map.getCanvas();
-    var cropperCanvas =  _this.cropper.cropper('getCroppedCanvas');
     var scaleElm = $('.mapboxgl-ctrl.mapboxgl-ctrl-scale')[0];
 
     html2canvas(scaleElm).then(function(canvas) {
         var dataURL = canvas.toDataURL('image/png');
         if (size === 'default') {
-            pdf.addImage(dataURL, 'png', w - MARGINS * 3.75,  h + 12);
+            pdf.addImage(dataURL, 'png', w - canvas.width + BORDER_MARGINS * 2,  h + BORDER_MARGINS / 2);
         } else {
-            pdf.addImage(dataURL, 'png', w - MARGINS * 3, h + 18)
+            pdf.addImage(dataURL, 'png', w - MARGINS * 3, h + MARGINS * 2)
         }
     })
 }
