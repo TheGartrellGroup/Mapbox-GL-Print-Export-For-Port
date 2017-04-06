@@ -144,19 +144,21 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
                 'png', BORDER_MARGINS, BORDER_MARGINS, DEFAULT_WIDTH - BORDER_MARGINS * 2, height - BORDER_MARGINS * 2);
 
             //line divider
-            pdf.setLineWidth(1.5);
+            pdf.setLineWidth(1);
             var pad1 = BORDER_MARGINS - 3;
-            pdf.setDrawColor(170,170,170)
+            pdf.setDrawColor(214,214,214);
             pdf.line(BORDER_MARGINS, DEFAULT_HEIGHT + pad1, DEFAULT_WIDTH - BORDER_MARGINS, DEFAULT_HEIGHT + pad1);
 
             //title
-            var pad2 = 21;
+            var pad2 = 20;
             pdf.setFontSize(12);
+            pdf.setTextColor(65,64,66);
             pdf.text(mapText.title, MARGINS, height + pad1 + pad2);
 
             //disclaimer
             var pad3 = 14;
             pdf.setFontSize(5);
+            pdf.setTextColor(109,110,113);
             var lines = pdf.splitTextToSize(mapText.disclaimer, DEFAULT_WIDTH - (MARGINS * 2));
             pdf.text(MARGINS, height + pad1 + pad2 + pad3, lines);
 
@@ -174,19 +176,21 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
                 'png', BORDER_MARGINS * PT_RATIO, BORDER_MARGINS * PT_RATIO, LARGE_WIDTH - BORDER_MARGINS * 2 * PT_RATIO, height - BORDER_MARGINS * 2 * PT_RATIO);
 
             //line divider
-            pdf.setLineWidth(1.5 * PT_RATIO);
+            pdf.setLineWidth(1.2 * PT_RATIO);
             var pad1 = (BORDER_MARGINS * PT_RATIO) - (5.5 * PT_RATIO);
-            pdf.setDrawColor(170,170,170)
+            pdf.setDrawColor(214,214,214);
             pdf.line(BORDER_MARGINS * PT_RATIO, LARGE_HEIGHT + pad1, LARGE_WIDTH - BORDER_MARGINS * PT_RATIO, LARGE_HEIGHT + pad1);
 
             //title
             var pad2 = 18 * PT_RATIO;
             pdf.setFontSize(12 * PT_RATIO);
+            pdf.setTextColor(65,64,66);
             pdf.text(mapText.title, MARGINS * PT_RATIO, height + pad1 + pad2);
 
             //disclaimer
             var pad3 = 14 * PT_RATIO;
             pdf.setFontSize(5 * PT_RATIO);
+            pdf.setTextColor(109,110,113);
             var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2 * PT_RATIO));
             pdf.text(MARGINS * PT_RATIO, height + pad1 + pad2 + pad3, lines);
 
