@@ -1,7 +1,7 @@
 'use strict';
 // in inches
 var default_height = 7.4,
-    large_height = 9.5,
+    large_height = 9.6,
     legend_width = 2.5,
     CANVAS_RATIO = '';
 
@@ -12,6 +12,8 @@ const DEFAULT_RATIO = DEFAULT_WIDTH / DEFAULT_HEIGHT;
 const LARGE_HEIGHT = large_height * 72;
 const LARGE_WIDTH = 1224 - (legend_width * 72);
 const LARGE_RATIO = LARGE_WIDTH / LARGE_HEIGHT;
+
+const PT_RATIO = (17 - legend_width) / 11;
 
 const MARGINS = 12;
 const BORDER_MARGINS = 9;
@@ -143,7 +145,7 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
 
             //line divider
             pdf.setLineWidth(1.5);
-            var pad1 = BORDER_MARGINS;
+            var pad1 = BORDER_MARGINS - 3;
             pdf.setDrawColor(170,170,170)
             pdf.line(BORDER_MARGINS, DEFAULT_HEIGHT + pad1, DEFAULT_WIDTH - BORDER_MARGINS, DEFAULT_HEIGHT + pad1);
 
@@ -167,30 +169,39 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
     } else {
         if (mapText.disclaimer !== '') {
             var height = LARGE_HEIGHT + 4;
+            //map
             pdf.addImage(_this.cropper.cropper('getCroppedCanvas').toDataURL('image/png'),
-                'png', 0, 0, LARGE_WIDTH, height);
+                'png', BORDER_MARGINS * PT_RATIO, BORDER_MARGINS * PT_RATIO, LARGE_WIDTH - BORDER_MARGINS * 2 * PT_RATIO, height - BORDER_MARGINS * 2 * PT_RATIO);
 
-            var pad1 = 29;
-            pdf.setFontSize(pad1 - 8);
-            pdf.text(mapText.title, MARGINS, height + pad1);
+            //line divider
+            pdf.setLineWidth(1.5 * PT_RATIO);
+            var pad1 = (BORDER_MARGINS * PT_RATIO) - (5.5 * PT_RATIO);
+            pdf.setDrawColor(170,170,170)
+            pdf.line(BORDER_MARGINS * PT_RATIO, LARGE_HEIGHT + pad1, LARGE_WIDTH - BORDER_MARGINS * PT_RATIO, LARGE_HEIGHT + pad1);
 
-            var pad2 = 22;
-            pdf.setFontSize(pad2 - 8);
-            var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2));
-            pdf.text(MARGINS, height + pad1 + pad2, lines);
+            //title
+            var pad2 = 18 * PT_RATIO;
+            pdf.setFontSize(12 * PT_RATIO);
+            pdf.text(mapText.title, MARGINS * PT_RATIO, height + pad1 + pad2);
 
-            var pad3 = 23;
+            //disclaimer
+            var pad3 = 14 * PT_RATIO;
+            pdf.setFontSize(5 * PT_RATIO);
+            var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2 * PT_RATIO));
+            pdf.text(MARGINS * PT_RATIO, height + pad1 + pad2 + pad3, lines);
+
+            var pad3 = 23 * PT_RATIO;
             var startLegend = LARGE_WIDTH + 6;
-            pdf.setFontSize(pad3 - 6);
+            pdf.setFontSize(17);
             pdf.text('Legend', startLegend, pad3);
 
             this.buildLegend(startLegend, pad3, pdf);
 
             //north arrow
-            _this.addNorthArrow(DEFAULT_HEIGHT, pad1 + pad2, DEFAULT_WIDTH - BORDER_MARGINS, size, pdf);
+            _this.addNorthArrow(LARGE_HEIGHT, pad1 + pad2, LARGE_WIDTH - BORDER_MARGINS * PT_RATIO, size, pdf);
 
             //scalebar
-            // _this.addScaleBar(pdf, size, LARGE_HEIGHT, LARGE_WIDTH);
+            _this.addScaleBar(pdf, size, (height - BORDER_MARGINS * 4 * PT_RATIO), (LARGE_WIDTH - BORDER_MARGINS * 2 * PT_RATIO));
         }
     }
 
@@ -214,8 +225,8 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
       canvas.width = 30;
       canvas.height = 30;
     } else {
-      canvas.width = 50;
-      canvas.height = 50;
+      canvas.width = 45;
+      canvas.height = 45;
     }
 
     canvas.attributes.h = height + pad;
@@ -235,16 +246,15 @@ PrintControl.prototype.addNorthArrow = function (height, pad, width, size, pdf) 
         var dataURL = canvas.toDataURL('image/png');
 
         if (canvas.attributes.s === 'default') {
-          var w = canvas.attributes.w - (canvas.width + 48 - BORDER_MARGINS);
+          var w = canvas.attributes.w - (canvas.width + 40 - BORDER_MARGINS);
           var h = canvas.attributes.h - MARGINS;
         } else {
-          var w = canvas.attributes.w + canvas.width * 2.55;
-          var h = canvas.attributes.h + canvas.height * 2.75;
+          var w = canvas.attributes.w - (canvas.width + 40 - BORDER_MARGINS * PT_RATIO);
+          var h = canvas.attributes.h - MARGINS * PT_RATIO;
         }
         pdf.addImage(dataURL, 'png', w , h);
     }
     img.crossOrigin = '';
-
 }
 
 PrintControl.prototype.buildLegend = function(width, height, pdf) {
@@ -354,9 +364,9 @@ PrintControl.prototype.addScaleBar = function(pdf, size, h, w) {
     html2canvas(scaleElm).then(function(canvas) {
         var dataURL = canvas.toDataURL('image/png');
         if (size === 'default') {
-            pdf.addImage(dataURL, 'png', w - canvas.width + BORDER_MARGINS * 2,  h + BORDER_MARGINS / 2);
+            pdf.addImage(dataURL, 'png', (w + BORDER_MARGINS * 2 - canvas.width),  (h + BORDER_MARGINS / 2));
         } else {
-            pdf.addImage(dataURL, 'png', w - MARGINS * 3, h + MARGINS * 2)
+            pdf.addImage(dataURL, 'png', w + (BORDER_MARGINS * 3 * PT_RATIO) - (canvas.width * PT_RATIO),  h + (BORDER_MARGINS * PT_RATIO));
         }
     })
 }
