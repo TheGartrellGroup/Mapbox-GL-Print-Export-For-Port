@@ -30,7 +30,7 @@ gulp.task('scripts', function() {
 
 //minify css
 gulp.task('css', function() {
-  gulp.src(['css/print.css', 'node_modules/cropper/dist/cropper.min.css'])
+  gulp.src(['node_modules/cropper/dist/cropper.min.css'])
     .pipe(concat('styles.min.css'))
     .pipe(cleanCSS())
     .pipe(gulp.dest('dist/css'))

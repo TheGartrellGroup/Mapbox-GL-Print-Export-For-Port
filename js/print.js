@@ -2,7 +2,7 @@
 // in inches
 var default_height = 7.4,
     large_height = 9.6,
-    legend_width = 2.5,
+    legend_width = 2,
     CANVAS_RATIO = '';
 
 const DEFAULT_HEIGHT = default_height * 72;
@@ -194,12 +194,14 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
             var lines = pdf.splitTextToSize(mapText.disclaimer, LARGE_WIDTH - (MARGINS * 2 * PT_RATIO));
             pdf.text(MARGINS * PT_RATIO, height + pad1 + pad2 + pad3, lines);
 
-            var pad3 = 23 * PT_RATIO;
-            var startLegend = LARGE_WIDTH + 6;
-            pdf.setFontSize(17);
-            pdf.text('Legend', startLegend, pad3);
+            //legend
+            var pad4 = BORDER_MARGINS * 2 * PT_RATIO;
+            var startLegend = LARGE_WIDTH + BORDER_MARGINS / 2 * PT_RATIO;
+            pdf.setTextColor(25,25,26);
+            pdf.setFontSize(10 * PT_RATIO);
+            pdf.text('Legend', startLegend, pad4);
 
-            this.buildLegend(startLegend, pad3, pdf);
+            this.buildLegend(startLegend, pad4, pdf);
 
             //north arrow
             _this.addNorthArrow(LARGE_HEIGHT, pad1 + pad2, LARGE_WIDTH - BORDER_MARGINS * PT_RATIO, size, pdf);
@@ -272,9 +274,9 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
     // layer config
     var lyrConfig = map.lyrs;
-    var labelSize = 14;
-    var startingWidth = width + 2;
-    var startingHeight = height + 8;
+    var labelSize = 7 * PT_RATIO;
+    var startingWidth = width;
+    var startingHeight = height + 9 * PT_RATIO;
 
     var groupLayers = lyrConfig.filter(function(lyr) {
         return (lyr.hasOwnProperty('layerGroup'))
@@ -282,7 +284,8 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
     var groupLayerTracker = [];
 
-    pdf.setFontSize(labelSize);
+    pdf.setTextColor(25,25,26);
+    pdf.setFontSize(8 * PT_RATIO);
 
     for (var i = layers.length - 1; i >= 0; i--) {
         var startingHeight = startingHeight + labelSize;
@@ -300,10 +303,10 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
             // font-awesome icon?
             if (elm) {
-                _this.addFontAwesome(elm, id, pdf, startingWidth, startingHeight);
+                _this.addFontAwesome(elm, id, pdf, startingWidth, startingHeight + 1);
             // custom images?
             } else if (imgElm) {
-                _this.addImage(imgElm, id, pdf, startingWidth, startingHeight);
+                _this.addImage(imgElm, id, pdf, startingWidth, startingHeight + 1);
             }
 
             pdf.text(mapLayer.name, startingWidth + 18, startingHeight);
@@ -336,7 +339,7 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
                     for (var c = 0; c < childLayers.length; c++) {
                         var id = childLayers[c].id;
 
-                        var childHeight = startingHeight + (c * labelSize) + ((c + 1) * 6);
+                        var childHeight = startingHeight + (c * labelSize) + ((c + 1) * 6 * PT_RATIO);
                         groupLayerTracker.push(childLayers[c].id);
 
                         var elm = document.querySelector('#' + id + ' i');
@@ -344,20 +347,20 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
                         // font awesome icon?
                         if (elm) {
-                            _this.addFontAwesome(elm, id, pdf, startingWidth + 22, childHeight + labelSize);
+                            _this.addFontAwesome(elm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
                         // custom image icon?
                         } else if (imgElm) {
-                            _this.addImage(imgElm, id, pdf, startingWidth + 22, childHeight + labelSize);
+                            _this.addImage(imgElm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
                         }
 
-                        pdf.text(childLayers[c].name, startingWidth + 40, childHeight + labelSize);
+                        pdf.text(childLayers[c].name, startingWidth + 32 * PT_RATIO, childHeight + labelSize);
                     };
 
-                    startingHeight = childHeight;
+                    startingHeight = childHeight - labelSize;
                 }
             }
         }
-        startingHeight = startingHeight + 4;
+        startingHeight = startingHeight + labelSize;
     }
 }
 

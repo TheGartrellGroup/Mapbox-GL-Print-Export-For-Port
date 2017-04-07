@@ -12,7 +12,7 @@ var printBtn = document.getElementById('mapboxgl-ctrl-print');
 var exportView = document.getElementById('export-map');
 
 var printOptions = {
-    disclaimer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    disclaimer: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi.",
     northArrow: '../../north_arrow.svg'
 }
 
@@ -58,22 +58,6 @@ map.on('load', function () {
         }
     });
 
-    map.addSource('elevation', { type: 'geojson', data: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_geography_regions_elevation_points.geojson' });
-    map.addLayer({
-        "id": "elevation-points",
-        "type": "circle",
-        "source": "elevation",
-        "layout": {
-            "visibility": 'visible'
-        },
-        "paint": {
-            'circle-color': '#eae00b',
-            'circle-opacity': 0.8,
-            'circle-stroke-color': '#2b2424',
-            'circle-stroke-width': 1
-        }
-    });
-
 
     map.addSource('railroads', { 'type': 'geojson', 'data': 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_railroads_north_america.geojson'});
     map.addLayer({
@@ -95,14 +79,28 @@ map.on('load', function () {
         "id": "airports",
         "type": "symbol",
         "source": "airports",
-        "minzoom": 12,
-        "maxzoom": 15,
         "layout": {
             "visibility": 'visible',
             'icon-image': 'airport-11'
 
         },
         "paint": {}
+    });
+
+    map.addSource('elevation', { type: 'geojson', data: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_geography_regions_elevation_points.geojson' });
+    map.addLayer({
+        "id": "elevation-points",
+        "type": "circle",
+        "source": "elevation",
+        "layout": {
+            "visibility": 'visible'
+        },
+        "paint": {
+            'circle-color': '#eae00b',
+            'circle-opacity': 0.8,
+            'circle-stroke-color': '#2b2424',
+            'circle-stroke-width': 1
+        }
     });
 });
 
@@ -117,7 +115,7 @@ var layers =
                 'id': 'land',
                 'source': 'land',
                 'name': 'Land',
-                'icon': '../../north_arrow.svg'
+                'icon': '../../land.svg'
             },
             {
                 'id': 'state-boundaries',
@@ -125,12 +123,6 @@ var layers =
                 'name': 'State Bounds'
             }
         ]
-    },
-    {
-        'name': 'Elevated Points',
-        'id': 'elevation-points',
-        'source': 'elevation',
-        'directory': 'Misc',
     },
     {
         'name': 'Railroads',
@@ -143,6 +135,12 @@ var layers =
         'id': 'airports',
         'source': 'airports',
         'directory': 'Transportation'
+    },
+    {
+        'name': 'Elevated Points',
+        'id': 'elevation-points',
+        'source': 'elevation',
+        'directory': 'Transportation',
     },
 ];
 
