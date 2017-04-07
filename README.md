@@ -28,7 +28,8 @@
 ### Notes:
 Per the Port's request:
  - Dimensions are always in landscape
- - Legend's are only displayed on the 11 x 17
+ - Legends are only displayed on the 11 x 17
+   -  Layer names and icons are derived from the [Layer Tree](https://github.com/TheGartrellGroup/Mapbox-GL-JS-Layer-Tree)
  - Export/Print will only export the appropriate aspect ratio from the center of the map - any large boundaries that don't fit within the appropriate aspect ratio will be cropped and ignored
  - DIST folder includes minified src
  
