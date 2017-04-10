@@ -214,11 +214,11 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
     if (!isPNG) {
         setTimeout(function() {
           pdf.save('map.pdf');
-        }, 1500);
+        }, 2000);
     } else {
         setTimeout(function() {
             _this.printPNG(pdf);
-        }, 1750)
+        }, 2000)
     }
 }
 
@@ -291,7 +291,6 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
     pdf.setTextColor(25,25,26);
     pdf.setFontSize(8 * PT_RATIO);
-
     for (var i = layers.length - 1; i >= 0; i--) {
         var startingHeight = startingHeight + labelSize;
         var layer = layers[i];
@@ -412,11 +411,14 @@ PrintControl.prototype.addFontAwesome = function(elm, id, pdf, startingWidth, st
     canvas.height = 36;
 
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle = elm.style.color;
     ctx.font = "18px FontAwesome";
     ctx.textBaseline = "top";
     ctx.textAlign = "start";
+    ctx.fillStyle = elm.style.color;
     ctx.fillText(character, 9, 9);
+    ctx.strokeStyle = elm.style.webkitTextStrokeColor || '';
+    ctx.lineWidth = 1.5;
+    ctx.strokeText(character, 9, 9);
 
     var dataURL = canvas.toDataURL('image/png')
     pdf.addImage(dataURL, 'png', startingWidth - 4, startingHeight - (canvas.height / 2));
