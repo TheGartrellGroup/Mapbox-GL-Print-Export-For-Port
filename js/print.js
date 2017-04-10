@@ -218,7 +218,7 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
     } else {
         setTimeout(function() {
             _this.printPNG(pdf);
-        }, 1500)
+        }, 1750)
     }
 }
 
@@ -269,7 +269,12 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
     // map layers
     var layers = map.getStyle().layers.filter(function(lyr) {
-        return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1 && lyr.layout.visibility === 'visible')
+        if (lyr.hasOwnProperty('layout') && lyr.layout.hasOwnProperty('visibility')) {
+            return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1 && lyr.layout.visibility === 'visible')
+        } else {
+            return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1)
+        }
+
     });
 
     // layer config
