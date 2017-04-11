@@ -214,11 +214,11 @@ PrintControl.prototype.printPDF = function(size, mapText, zoom, center, bearing,
     if (!isPNG) {
         setTimeout(function() {
           pdf.save('map.pdf');
-        }, 2000);
+        }, 2250);
     } else {
         setTimeout(function() {
             _this.printPNG(pdf);
-        }, 2000)
+        }, 2250)
     }
 }
 
@@ -274,8 +274,18 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
         } else {
             return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1)
         }
-
     });
+
+    var tempLayers = [];
+    // need to only acknowledge visible layers that are within the LT
+    for (var tl = 0; tl < layers.length; tl++) {
+        var elm = '#' + layers[tl].id;
+        if ($('#mapboxgl-legend ' + elm).length) {
+            tempLayers.push(layers[tl]);
+        }
+    }
+
+    layers = tempLayers;
 
     // layer config
     var lyrConfig = map.lyrs;
@@ -291,6 +301,7 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
     pdf.setTextColor(25,25,26);
     pdf.setFontSize(8 * PT_RATIO);
+
     for (var i = layers.length - 1; i >= 0; i--) {
         var startingHeight = startingHeight + labelSize;
         var layer = layers[i];
@@ -417,7 +428,7 @@ PrintControl.prototype.addFontAwesome = function(elm, id, pdf, startingWidth, st
     ctx.fillStyle = elm.style.color;
     ctx.fillText(character, 9, 9);
     ctx.strokeStyle = elm.style.webkitTextStrokeColor || '';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2;
     ctx.strokeText(character, 9, 9);
 
     var dataURL = canvas.toDataURL('image/png')
