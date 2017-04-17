@@ -2,7 +2,7 @@
 // in inches
 var default_height = 7.4,
     large_height = 9.6,
-    legend_width = 2,
+    legend_width = 2.2,
     CANVAS_RATIO = '';
 
 const DEFAULT_HEIGHT = default_height * 72;
@@ -427,7 +427,7 @@ PrintControl.prototype.addFontAwesome = function(elm, id, pdf, startingWidth, st
     ctx.textAlign = "start";
     ctx.fillStyle = elm.style.color;
     ctx.fillText(character, 9, 9);
-    ctx.strokeStyle = elm.style.webkitTextStrokeColor || '';
+    ctx.strokeStyle = elm.style.webkitTextStrokeColor === '' ? 'transparent' : elm.style.webkitTextStrokeColor;
     ctx.lineWidth = 2;
     ctx.strokeText(character, 9, 9);
 
