@@ -2,7 +2,7 @@
 // in inches
 var default_height = 7.4,
     large_height = 9.6,
-    legend_width = 2.2,
+    legend_width = 2.25,
     CANVAS_RATIO = '';
 
 const DEFAULT_HEIGHT = default_height * 72;
@@ -13,7 +13,7 @@ const LARGE_HEIGHT = large_height * 72;
 const LARGE_WIDTH = 1224 - (legend_width * 72);
 const LARGE_RATIO = LARGE_WIDTH / LARGE_HEIGHT;
 
-const PT_RATIO = (17 - legend_width) / 11;
+const PT_RATIO = 15 / 11;
 
 const MARGINS = 12;
 const BORDER_MARGINS = 9;
