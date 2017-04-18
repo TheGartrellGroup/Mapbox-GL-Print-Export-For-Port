@@ -326,54 +326,53 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
 
             pdf.text(mapLayer.name, startingWidth + 18, startingHeight);
         } else {
-            var foundParent = groupLayers.filter(function(lay) {
-                return lay.layerGroup.filter(function(ly) {
-                    if (ly.id === layer.name) {
-                        return lay;
-                    }
+            for (var gr = 0; gr < groupLayers.length; gr++) {
+                var found = groupLayers[gr].layerGroup.filter(function(lay) {
+                    return lay.id === layer.id
                 })
-            })
 
-            if (foundParent.length > 0) {
-                // have we added this group of layers yet?
-                if (groupLayerTracker.indexOf(layer.id) === -1) {
-                    pdf.text(foundParent[0].name, startingWidth + 18, startingHeight);
+                if (found.length > 0) {
+                    // have we added this group of layers yet?
+                    if (groupLayerTracker.indexOf(layer.id) === -1) {
+                        pdf.text(groupLayers[gr].name, startingWidth + 18, startingHeight);
 
-                    var layerGroup = foundParent[0].layerGroup;
-                    var childLayers = [];
+                        var layerGroup = groupLayers[gr].layerGroup;
+                        var childLayers = [];
 
-                    //get childLayers within a specific layerGroup
-                    for (var ml = layers.length - 1; ml >= 0; ml--) {
-                        for (var lg = 0; lg < layerGroup.length; lg++) {
-                          if (layers[ml].id === layerGroup[lg].id) {
-                            childLayers.push(layerGroup[lg]);
-                          }
+                        //get childLayers within a specific layerGroup
+                        for (var ml = layers.length - 1; ml >= 0; ml--) {
+                            for (var lg = 0; lg < layerGroup.length; lg++) {
+                              if (layers[ml].id === layerGroup[lg].id) {
+                                childLayers.push(layerGroup[lg]);
+                              }
+                            };
                         };
-                    };
 
-                    for (var c = 0; c < childLayers.length; c++) {
-                        var id = childLayers[c].id;
+                        for (var c = 0; c < childLayers.length; c++) {
+                            var id = childLayers[c].id;
 
-                        var childHeight = startingHeight + (c * labelSize) + ((c + 1) * 6 * PT_RATIO);
-                        groupLayerTracker.push(childLayers[c].id);
+                            var childHeight = startingHeight + (c * labelSize) + ((c + 1) * 6 * PT_RATIO);
+                            groupLayerTracker.push(childLayers[c].id);
 
-                        var elm = document.querySelector('#' + id + ' i');
-                        var imgElm = document.querySelector('#' + id + ' img');
+                            var elm = document.querySelector('#' + id + ' i');
+                            var imgElm = document.querySelector('#' + id + ' img');
 
-                        // font awesome icon?
-                        if (elm) {
-                            _this.addFontAwesome(elm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
-                        // custom image icon?
-                        } else if (imgElm) {
-                            _this.addImage(imgElm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
-                        }
+                            // font awesome icon?
+                            if (elm) {
+                                _this.addFontAwesome(elm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
+                            // custom image icon?
+                            } else if (imgElm) {
+                                _this.addImage(imgElm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
+                            }
 
-                        pdf.text(childLayers[c].name, startingWidth + 32 * PT_RATIO, childHeight + labelSize);
-                    };
+                            pdf.text(childLayers[c].name, startingWidth + 32 * PT_RATIO, childHeight + labelSize);
+                        };
 
-                    startingHeight = childHeight - labelSize;
+                        startingHeight = childHeight - labelSize;
+                    }
                 }
             }
+
         }
         startingHeight = startingHeight + labelSize;
     }
@@ -427,7 +426,7 @@ PrintControl.prototype.addFontAwesome = function(elm, id, pdf, startingWidth, st
     ctx.textAlign = "start";
     ctx.fillStyle = elm.style.color;
     ctx.fillText(character, 9, 9);
-    ctx.strokeStyle = elm.style.webkitTextStrokeColor === '' ? 'transparent' : elm.style.webkitTextStrokeColor;
+    ctx.strokeStyle = elm.style.webkitTextStrokeColor === '' || elm.style.webkitTextStrokeColor === 'initial' ? 'transparent' : elm.style.webkitTextStrokeColor;
     ctx.lineWidth = 2;
     ctx.strokeText(character, 9, 9);
 
