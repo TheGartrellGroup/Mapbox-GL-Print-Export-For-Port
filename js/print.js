@@ -313,15 +313,15 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
             var mapLayer = nonGroupedLayer[0];
             var id = mapLayer.id;
 
-            var elm = document.querySelector('#' + id + ' i');
-            var imgElm = document.querySelector('#' + id + ' img');
+            var elm = $('#' + id + '> i');
+            var imgElm = $('#' + id + '> img');
 
             // font-awesome icon?
-            if (elm) {
-                _this.addFontAwesome(elm, id, pdf, startingWidth, startingHeight + 1);
+            if (elm.length) {
+                _this.addFontAwesome(elm[0], id, pdf, startingWidth, startingHeight + 1);
             // custom images?
-            } else if (imgElm) {
-                _this.addImage(imgElm, id, pdf, startingWidth, startingHeight + 1);
+            } else if (imgElm.length) {
+                _this.addImage(imgElm[0], id, pdf, startingWidth, startingHeight + 1);
             }
 
             pdf.text(mapLayer.name, startingWidth + 18, startingHeight);
@@ -334,6 +334,19 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
                 if (found.length > 0) {
                     // have we added this group of layers yet?
                     if (groupLayerTracker.indexOf(layer.id) === -1) {
+
+                        var id = groupLayers[gr].id;
+                        var elm = $('#' + id + '> i');
+                        var imgElm = $('#' + id + '> img');
+
+                        // font-awesome icon?
+                        if (elm.length) {
+                            _this.addFontAwesome(elm[0], id, pdf, startingWidth, startingHeight + 1);
+                        // custom images?
+                        } else if (imgElm.length) {
+                            _this.addImage(imgElm[0], id, pdf, startingWidth, startingHeight + 1);
+                        }
+
                         pdf.text(groupLayers[gr].name, startingWidth + 18, startingHeight);
 
                         var layerGroup = groupLayers[gr].layerGroup;
@@ -354,15 +367,15 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
                             var childHeight = startingHeight + (c * labelSize) + ((c + 1) * 6 * PT_RATIO);
                             groupLayerTracker.push(childLayers[c].id);
 
-                            var elm = document.querySelector('#' + id + ' i');
-                            var imgElm = document.querySelector('#' + id + ' img');
+                            var elm = $('#' + id + '> i');
+                            var imgElm = $('#' + id + '> img');
 
                             // font awesome icon?
-                            if (elm) {
-                                _this.addFontAwesome(elm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
+                            if (elm.length) {
+                                _this.addFontAwesome(elm[0], id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
                             // custom image icon?
-                            } else if (imgElm) {
-                                _this.addImage(imgElm, id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
+                            } else if (imgElm.length) {
+                                _this.addImage(imgElm[0], id, pdf, startingWidth + 18 * PT_RATIO, childHeight + labelSize + 1);
                             }
 
                             pdf.text(childLayers[c].name, startingWidth + 32 * PT_RATIO, childHeight + labelSize);
