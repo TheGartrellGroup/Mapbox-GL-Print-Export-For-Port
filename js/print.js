@@ -270,9 +270,9 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
     // map layers
     var layers = map.getStyle().layers.filter(function(lyr) {
         if (lyr.hasOwnProperty('layout') && lyr.layout.hasOwnProperty('visibility')) {
-            return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1 && lyr.layout.visibility === 'visible')
+            return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1 && lyr.id.indexOf('custom-text-label') == -1 && lyr.layout.visibility === 'visible');
         } else {
-            return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1)
+            return (lyr.source && lyr.source !== 'composite' && lyr.source.indexOf('mapbox-gl-draw') == -1 && lyr.id.indexOf('custom-text-label') == -1);
         }
     });
 
