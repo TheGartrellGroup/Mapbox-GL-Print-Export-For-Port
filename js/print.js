@@ -298,18 +298,28 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
     })
 
     var groupLayerTracker = [];
+    var groupLoop = false;
 
     pdf.setTextColor(25,25,26);
     pdf.setFontSize(8 * PT_RATIO);
 
     for (var i = layers.length - 1; i >= 0; i--) {
-        var startingHeight = startingHeight + labelSize;
+
+        //only add labelSize if it's the top layer OR it's not a group
+        if (i === layers.length - 1 || !groupLoop) {
+            startingHeight = startingHeight + labelSize;
+        } else {
+            startingHeight = startingHeight;
+        }
+
         var layer = layers[i];
         var nonGroupedLayer = lyrConfig.filter(function(lyr) {
             return (lyr.id === layer.id)
         })
 
         if (nonGroupedLayer.length) {
+            groupLoop = false;
+
             var mapLayer = nonGroupedLayer[0];
             var id = mapLayer.id;
 
@@ -325,7 +335,11 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
             }
 
             pdf.text(mapLayer.name, startingWidth + 18, startingHeight);
+            startingHeight = startingHeight + labelSize;
+
         } else {
+            groupLoop = true;
+
             for (var gr = 0; gr < groupLayers.length; gr++) {
                 var found = groupLayers[gr].layerGroup.filter(function(lay) {
                     return lay.id === layer.id
@@ -381,13 +395,13 @@ PrintControl.prototype.buildLegend = function(width, height, pdf) {
                             pdf.text(childLayers[c].name, startingWidth + 32 * PT_RATIO, childHeight + labelSize);
                         };
 
-                        startingHeight = childHeight - labelSize;
+                        //this group layer loop is now complete
+                        groupLoop = false;
+                        startingHeight = childHeight + 2 * labelSize;
                     }
                 }
             }
-
         }
-        startingHeight = startingHeight + labelSize;
     }
 }
 
