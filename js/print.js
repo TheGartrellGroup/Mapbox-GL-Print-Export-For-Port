@@ -102,7 +102,7 @@ PrintControl.prototype.exportMap = function(e) {
 PrintControl.prototype.printPNG = function(pdf) {
     var _this = this;
 
-    PDFJS.getDocument(pdf.output('datauri')).then(function(doc) {
+    PDFJS.getDocument(pdf.output('bloburi')).then(function(doc) {
         doc.getPage(1).then(function(page) {
             var scale = 1.5;
             var viewport = page.getViewport(scale);
